@@ -1,0 +1,13 @@
+node_modules/
+dist/
+server/public/
+.env
+.env.*
+!.env.example
+npm-debug.log*
+*.local
+backups/
+output/
+tmp/
+File path here
+question content.docx

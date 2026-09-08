@@ -1,0 +1,52 @@
+{
+  "name": "neurocogno-production-spa",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "client:dev": "vite --config client/vite.config.js --host 127.0.0.1",
+    "server:dev": "nodemon server/src/server.js",
+    "start": "node server/src/server.js",
+    "build": "vite build --config client/vite.config.js",
+    "check": "node --check server/src/server.js && node --check server/src/routes/publicRoutes.js && node --check server/src/routes/adminRoutes.js && node --check server/src/routes/authRoutes.js && node --check server/src/routes/paymentRoutes.js"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.11.0",
+    "compression": "^1.7.4",
+    "concurrently": "^9.1.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.5.0",
+    "file-type": "^22.0.2",
+    "helmet": "^8.0.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.468.0",
+    "mongoose": "^8.9.2",
+    "nanoid": "^5.0.9",
+    "node-cron": "^4.6.0",
+    "pino": "^9.5.0",
+    "pino-http": "^10.4.0",
+    "razorpay": "^2.9.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.35.4",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "vite": "^6.0.6",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "overrides": {
+    "qs": "6.16.0"
+  }
+}

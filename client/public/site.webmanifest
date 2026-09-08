@@ -1,0 +1,17 @@
+{
+  "name": "NeuroCogno",
+  "short_name": "NeuroCogno",
+  "description": "Mental wellness and counselling support for children, teens, adults, seniors, families and relationships.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffdfb",
+  "theme_color": "#7652a8",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

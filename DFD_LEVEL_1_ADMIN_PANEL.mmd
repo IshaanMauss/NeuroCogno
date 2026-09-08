@@ -1,0 +1,72 @@
+%% NeuroCogno Admin Panel DFD - Level 1 Admin Operations
+%% Created: 2026-08-27
+flowchart TB
+    Admin[CEO / COO / Developer Admin]
+
+    subgraph A1[Admin Access]
+        Login[Login Screen]
+        Session[Authenticated Session]
+        RoleCheck[RBAC Role Check]
+    end
+
+    subgraph A2[CRM Lead Operations]
+        Search[Search Leads]
+        EditLead[Edit Missing Details]
+        Confirm[Confirm / Paid Client Marking]
+        Archive[Archive With Reason]
+    end
+
+    subgraph A3[Website Media & Text CMS]
+        AreaPicker[Choose Website Area]
+        FieldSchema[Show Only Required Fields]
+        Upload[Upload + Compress Media]
+        Replace[Replace / Update Content]
+        Publish[Publish / Hide]
+        Delete[Delete Permanently]
+    end
+
+    subgraph A4[Operational Visibility]
+        Metrics[Dashboard Metrics]
+        Traffic[Website Health & Traffic]
+        Logs[Server / Payment / Upload Logs]
+        Issues[Issue Severity View]
+    end
+
+    D1[(Admin Users)]
+    D2[(Lead Records)]
+    D3[(Site Content Items)]
+    D4[(Uploaded Media)]
+    D5[(Visitor Events)]
+    D6[(Payments)]
+    D7[(System Issues / Audit Logs)]
+
+    Admin --> Login --> Session --> RoleCheck
+    RoleCheck --> Search
+    RoleCheck --> EditLead
+    RoleCheck --> Confirm
+    RoleCheck --> Archive
+    RoleCheck --> AreaPicker
+    RoleCheck --> Metrics
+    RoleCheck --> Traffic
+    RoleCheck --> Logs
+
+    Login <--> D1
+    Search <--> D2
+    EditLead <--> D2
+    Confirm <--> D2
+    Archive <--> D2
+
+    AreaPicker --> FieldSchema --> Upload
+    FieldSchema --> Replace
+    FieldSchema --> Publish
+    FieldSchema --> Delete
+    Upload <--> D4
+    Replace <--> D3
+    Publish <--> D3
+    Delete <--> D3
+
+    Metrics <--> D2
+    Metrics <--> D6
+    Traffic <--> D5
+    Logs <--> D7
+    Issues <--> D7

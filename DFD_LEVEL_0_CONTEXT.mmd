@@ -1,0 +1,21 @@
+%% NeuroCogno DFD Level 0 - Context Diagram
+%% Created: 2026-08-27
+flowchart LR
+    Visitor[Website Visitor / Client]
+    Admin[CEO / COO / Developer Admin]
+    Neuro[NeuroCogno Web Platform]
+    Mongo[(MongoDB Database)]
+    Razorpay[Razorpay Payment Gateway]
+    WhatsApp[WhatsApp / Callback Channel]
+    Email[Email Channel]
+
+    Visitor -->|Browse pages, survey answers, appointment form, collaboration enquiry| Neuro
+    Neuro -->|Public pages, CMS content, booking status, contact prompts| Visitor
+
+    Admin -->|Login, search, edit, confirm, archive, CMS updates| Neuro
+    Neuro -->|Leads, CRM records, media library, traffic, logs, payment status| Admin
+
+    Neuro <--> |Create/read/update records| Mongo
+    Neuro <--> |Orders, checkout, verification, webhook events| Razorpay
+    Neuro -->|Redirect support request| WhatsApp
+    Neuro -->|Future notifications and support mail| Email

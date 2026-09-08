@@ -1,0 +1,102 @@
+%% NeuroCogno DFD Level 1 - Detailed System Flow
+%% Created: 2026-08-27
+flowchart TB
+    Visitor[Website Visitor / Client]
+    Admin[CEO / COO / Developer Admin]
+    Razorpay[Razorpay]
+    WhatsApp[WhatsApp Redirect]
+
+    subgraph P1[1. Public Website Experience]
+        Routes[Page Routes: About Us, Insight, Workshops, Collaboration, Services]
+        CMSRender[Render CMS Media/Text]
+        Survey[Survey Popup + Dev Test Controls]
+        Appointment[Appointment Form]
+        CollabForm[Collaboration Enquiry Form]
+        VisitorTracking[Visitor Event Tracking]
+    end
+
+    subgraph P2[2. Lead Capture And CRM]
+        SurveyLead[Survey Lead Intake]
+        DirectLead[Direct Appointment Lead Intake]
+        DraftLead[Saved / Incomplete Draft Lead]
+        CollabLead[Collaboration Request Intake]
+        LeadActions[Search, Edit, Remarks, Confirm, Archive]
+    end
+
+    subgraph P3[3. Admin And RBAC]
+        Login[Admin Login]
+        RBAC[Role Checks: CEO, COO, Developer]
+        Dashboard[Admin Dashboard Tabs]
+        CMSAdmin[Website Media & Text CMS]
+    end
+
+    subgraph P4[4. Payment Pipeline]
+        OrderCreate[Create Payment Order]
+        Checkout[Client Checkout]
+        Verify[Verify Signature / Webhook]
+        PaymentState[Update Payment State]
+    end
+
+    subgraph P5[5. Monitoring And Logs]
+        Health[Website Health & Traffic]
+        Issues[Server / Payment / Upload Issues]
+        Audit[Admin Change Audit Trail]
+    end
+
+    D1[(Admin Users)]
+    D2[(Lead Records)]
+    D3[(Payment Records)]
+    D4[(Visitor Events)]
+    D5[(System Issues)]
+    D6[(Site Content / CMS Items)]
+    D7[(Uploaded Media Files)]
+
+    Visitor --> Routes
+    Routes --> CMSRender
+    CMSRender <--> D6
+    CMSRender <--> D7
+    Routes --> Survey
+    Routes --> Appointment
+    Routes --> CollabForm
+    Routes --> VisitorTracking
+    Routes -->|Need help click| WhatsApp
+
+    Survey --> SurveyLead
+    Appointment --> DirectLead
+    Appointment --> DraftLead
+    CollabForm --> CollabLead
+    VisitorTracking --> D4
+
+    SurveyLead --> D2
+    DirectLead --> D2
+    DraftLead --> D2
+    CollabLead --> D2
+
+    Admin --> Login
+    Login --> D1
+    Login --> RBAC
+    RBAC --> Dashboard
+    Dashboard --> LeadActions
+    Dashboard --> CMSAdmin
+    Dashboard --> Health
+    Dashboard --> Issues
+
+    LeadActions <--> D2
+    CMSAdmin <--> D6
+    CMSAdmin <--> D7
+    CMSAdmin --> Audit
+    LeadActions --> Audit
+    Audit --> D5
+
+    DirectLead --> OrderCreate
+    OrderCreate --> Razorpay
+    Razorpay --> Checkout
+    Checkout --> Verify
+    Verify --> PaymentState
+    PaymentState --> D3
+    PaymentState --> D2
+    Verify -->|Failure / mismatch| Issues
+
+    Health <--> D4
+    Issues <--> D5
+    CMSAdmin -->|Upload/compression errors| Issues
