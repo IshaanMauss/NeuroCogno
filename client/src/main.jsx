@@ -14,6 +14,7 @@ import {
   Lock,
   LogOut,
   Mail,
+  Menu,
   Monitor,
   Moon,
   Phone,
@@ -550,6 +551,34 @@ function activeNavPath() {
 
 function Header({ contact, theme, onToggleTheme }) {
   const currentNavPath = activeNavPath();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Close the mobile menu automatically on any route change (nav click,
+    // back/forward, programmatic navigateTo), so it never stays open over
+    // the next page by mistake.
+    const closeMenu = () => setMenuOpen(false);
+    window.addEventListener('popstate', closeMenu);
+    return () => window.removeEventListener('popstate', closeMenu);
+  }, []);
+
+  useEffect(() => {
+    // Prevent background scroll while the mobile menu overlay is open.
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
+  function go(path) {
+    setMenuOpen(false);
+    navigateTo(path);
+  }
+
+  function goBookFromMenu() {
+    setMenuOpen(false);
+    goToBooking();
+  }
 
   return (
     <header className="siteHeader">
@@ -577,6 +606,44 @@ function Header({ contact, theme, onToggleTheme }) {
       <a className="mobileCall" href={`tel:${contact.ceoPhone}`} aria-label="Connect with NeuroCogno team">
         <Phone size={18} />
       </a>
+      <button
+        type="button"
+        className="mobileMenuToggle"
+        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        {menuOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
+      {menuOpen && (
+        <div className="mobileMenuOverlay" role="dialog" aria-modal="true" aria-label="Site menu">
+          <nav className="mobileMenuLinks" aria-label="Main navigation (mobile)">
+            {navItems.map(([path, label]) => {
+              const isActive = currentNavPath === path;
+              return (
+                <button
+                  key={path}
+                  className={isActive ? 'active' : ''}
+                  aria-current={isActive ? 'page' : undefined}
+                  onClick={() => go(path)}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </nav>
+          <div className="mobileMenuActions">
+            <button className="primaryButton" onClick={goBookFromMenu}>
+              <CalendarDays size={18} />
+              Book Appointment
+            </button>
+            <a className="outlineButton mobileMenuCall" href={`tel:${contact.ceoPhone}`} onClick={() => setMenuOpen(false)}>
+              <Phone size={18} />
+              Call the team
+            </a>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
