@@ -11380,3 +11380,230 @@ html[data-theme="dark"] .mobileMenuLinks button[aria-current="page"] {
   border-color: rgba(197, 208, 139, 0.32);
   color: #c5d08b;
 }
+
+/* ======================================================================
+   2026-09-10: Client feedback batch - mobile UX, dark mode, content, IA
+   Appended last on purpose so these rules reliably win over the legacy
+   duplicated rules earlier in this file (source-order tie-break).
+   ====================================================================== */
+
+/* --- Hero: new kicker line above the eyebrow --- */
+.heroKicker {
+  font-size: 0.8rem !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+  opacity: 0.85 !important;
+  margin-bottom: 6px !important;
+}
+
+/* --- Eyebrow / hero accent word must NOT match the logo's brand color ---
+   (client: "Use different Color, so it look different from logo.")
+   Logo wordmark ("Cogno") keeps its own blue; eyebrow + "Lives." get a
+   distinct warm rose accent instead. */
+.eyebrow,
+.hero .eyebrow,
+.heroKicker,
+.helpDetailModal .eyebrow {
+  color: #b5556f !important;
+}
+.hero h1 span,
+.heroCopy h1 span {
+  color: #b5556f !important;
+}
+html[data-theme="dark"] .eyebrow,
+html[data-theme="dark"] .hero .eyebrow,
+html[data-theme="dark"] .heroKicker,
+html[data-theme="dark"] .helpDetailModal .eyebrow {
+  color: #e496ab !important;
+}
+html[data-theme="dark"] .hero h1 span,
+html[data-theme="dark"] .heroCopy h1 span {
+  color: #e496ab !important;
+}
+/* Logo wordmark stays on its own blue in both themes, unaffected by the above */
+.logoButton strong span,
+html[data-theme="dark"] .logoButton strong span {
+  color: #5f91ad !important;
+}
+
+/* --- Logo: must look identical in light and dark mode, and be bigger --- */
+.logoMark,
+html[data-theme="dark"] .logoMark {
+  width: 84px !important;
+  height: 84px !important;
+  background:
+    radial-gradient(circle at center, rgba(255, 253, 251, 0.94), rgba(228, 240, 235, 0.68) 58%, transparent 72%) !important;
+}
+.logoButton strong {
+  font-size: 1.32em !important;
+}
+.logoButton small {
+  font-size: 12.5px !important;
+}
+@media (max-width: 900px) {
+  .logoMark,
+  html[data-theme="dark"] .logoMark {
+    width: 62px !important;
+    height: 62px !important;
+  }
+}
+
+/* --- Footer: guarantee readable text in dark mode ---
+   (client screenshot showed the footer's logo tagline, "Quick Links"
+   heading, nav links, and Contact Us block with invisible text over the
+   dark footer background.) */
+html[data-theme="dark"] .footer {
+  background: linear-gradient(135deg, #14202c, #1d2b34) !important;
+}
+html[data-theme="dark"] .footer,
+html[data-theme="dark"] .footer *,
+html[data-theme="dark"] .footer p,
+html[data-theme="dark"] .footer h3,
+html[data-theme="dark"] .footer span {
+  color: #eef3f5 !important;
+}
+html[data-theme="dark"] .footer h3 {
+  color: #cfe3ea !important;
+}
+html[data-theme="dark"] .footer a,
+html[data-theme="dark"] .footer button {
+  color: #9fd0e8 !important;
+}
+html[data-theme="dark"] .footer a:hover,
+html[data-theme="dark"] .footer button:hover {
+  color: #ffffff !important;
+}
+
+/* --- "Who We Help" > Learn More modal: readable focus pills in both themes --- */
+.helpDetailFocus span {
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #2f3f29 !important;
+  border-color: rgba(118, 130, 70, 0.22) !important;
+}
+html[data-theme="dark"] .helpDetailFocus span {
+  background: rgba(37, 53, 42, 0.92) !important;
+  color: #f2f7e4 !important;
+  border-color: rgba(210, 220, 131, 0.32) !important;
+}
+
+/* --- "How It Works": two-column layout (numbers left, icon+label right) --- */
+.twoColumnSteps {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+.stepRow {
+  display: grid !important;
+  grid-template-columns: 48px 1fr !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.55) !important;
+  border: 1px solid rgba(95, 143, 196, 0.16) !important;
+}
+.stepNumber {
+  display: grid !important;
+  place-items: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  font-family: var(--font-display) !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #5f91ad, #7fa6bd) !important;
+}
+.stepDetail {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+.stepDetail .stepIcon {
+  display: grid !important;
+  place-items: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 auto !important;
+  border-radius: 50% !important;
+  background: rgba(95, 143, 196, 0.14) !important;
+  color: #5f91ad !important;
+}
+.stepDetail p {
+  margin: 0 !important;
+  font-weight: 650 !important;
+}
+html[data-theme="dark"] .stepRow {
+  background: rgba(19, 31, 25, 0.55) !important;
+  border-color: rgba(210, 220, 131, 0.2) !important;
+}
+html[data-theme="dark"] .stepDetail .stepIcon {
+  background: rgba(210, 220, 131, 0.14) !important;
+  color: #d2dc83 !important;
+}
+
+/* --- Founder photo (and portrait-style images generally): keep the face
+   fully visible instead of getting cropped by a fixed-height container --- */
+.founderPortrait {
+  min-height: 340px !important;
+}
+.founderPortrait img.objectFitFace,
+.founderPortrait img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top center !important;
+}
+@media (max-width: 900px) {
+  .founderPortrait {
+    min-height: 300px !important;
+  }
+}
+
+/* --- Insight Hub intro paragraph: remove the artificial 42ch cap that was
+   producing uneven, ragged line wraps on mobile --- */
+@media (max-width: 900px) {
+  .insightIntro p,
+  .marqueeHeader p,
+  .creativeCanvasIntro p {
+    max-width: 100% !important;
+    text-wrap: pretty;
+  }
+}
+
+/* --- Card captions: always keep text in a solid background block below the
+   image, never overlapping it (photo wall, workshop cards, creative canvas) --- */
+.marqueeCard,
+.workshopCard,
+.creativeFeature,
+.creativeMini {
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+.marqueeCard span,
+.marqueeCard h3,
+.workshopCard span,
+.workshopCard h3,
+.workshopCard p,
+.creativeFeature > div,
+.creativeMini > div {
+  position: relative !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] .marqueeCard,
+html[data-theme="dark"] .workshopCard,
+html[data-theme="dark"] .creativeFeature,
+html[data-theme="dark"] .creativeMini {
+  background: rgba(19, 31, 25, 0.92) !important;
+}
+
+/* --- Booking form: keep the new Age input + Reason/Age Group row tidy --- */
+.bookingForm .fieldPair {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+}
+@media (max-width: 560px) {
+  .bookingForm .fieldPair {
+    grid-template-columns: 1fr !important;
+  }
+}

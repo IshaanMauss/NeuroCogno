@@ -13,6 +13,7 @@ export const leadDraftSchema = z.object({
   phone: z.string().trim().regex(phoneRegex).optional().or(z.literal('')),
   email: z.string().trim().email().optional().or(z.literal('')),
   source: z.enum(['appointment_form', 'survey_popup', 'collaboration_inquiry']).default('appointment_form'),
+  age: z.string().trim().max(10).optional().or(z.literal('')),
   ageGroup: z.string().trim().max(40).optional().or(z.literal('')),
   reason: z.string().trim().max(120).optional().or(z.literal('')),
   message: z.string().trim().max(1000).optional().or(z.literal(''))

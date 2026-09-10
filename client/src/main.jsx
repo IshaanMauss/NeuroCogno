@@ -655,7 +655,7 @@ const dailyInsights = [
     title: 'Name the feeling',
     kicker: 'Today\'s Gentle Insight',
     body: 'Affect labeling, simply naming what you feel, can reduce emotional intensity and make the next step easier to choose.',
-    action: 'Try saying: I am noticing worry, not I am worry.'
+    action: 'Try saying: "I am noticing worry," not "I am worried."'
   },
   {
     title: 'One slower breath',
@@ -709,7 +709,7 @@ function DailyInsight() {
     <>
       <button className="dailyInsightChip" type="button" onClick={() => setOpen(true)}>
         <Sparkles size={18} />
-        <span>{insight.kicker}</span>
+        <span>Today's Wellbeing Tip</span>
       </button>
       {open && createPortal(
         <div className="insightOverlay" role="dialog" aria-modal="true">
@@ -882,14 +882,19 @@ function Hero({ contact, content = [], onOpenSurvey }) {
           <circle className="sigilDot" cx="260" cy="100" r="18" />
         </g>
       </svg>
+        <p className="eyebrow heroKicker">Every Mind Matters, Every Journey Counts</p>
         <p className="eyebrow">{contentByKey(content, 'homepage.hero.eyebrow', 'Compassionate. Confidential. Caring.')}</p>
         <h1>
-          Supporting Minds,
+          Empowering Minds,
           <br />
           Enriching <span>Lives.</span>
         </h1>
         <p className="heroText">
-          {contentByKey(content, 'homepage.hero.subtitle', 'Professional counselling and psychological support for children, teens, adults and seniors.')}
+          {contentByKey(
+            content,
+            'homepage.hero.subtitle',
+            'Professional counselling and psychological support for children, teens, adults, seniors (geriatric), family and educators.'
+          )}
         </p>
         <DailyInsight />
         <div className="heroActions">
@@ -1273,14 +1278,16 @@ function Services() {
       </div>
       <div className="processPanel">
         <h2>How It Works</h2>
-        <div className="steps simpleSteps">
+        <div className="steps twoColumnSteps">
           {steps.map(([label, Icon], index) => (
-            <div className="step" key={label}>
-              <span className="stepIcon">
-                <Icon size={30} />
+            <div className="stepRow" key={label}>
+              <span className="stepNumber">{index + 1}</span>
+              <span className="stepDetail">
+                <span className="stepIcon">
+                  <Icon size={26} />
+                </span>
+                <p>{label}</p>
               </span>
-              <strong>{index + 1}</strong>
-              <p>{label}</p>
             </div>
           ))}
         </div>
@@ -1352,7 +1359,7 @@ const serviceDocItems = [
 ];
 
 const serviceFaqs = [
-  ['Which service should I choose first?', 'If you are unsure, start with the appointment request. The team can understand your concern and guide you toward the right support path.'],
+  ['Which service should I choose first?', 'If you are unsure, start with the appointment request. The team can understand your concern and guide you towards the right support path.'],
   ['Can counselling be online?', 'Yes. Depending on availability and suitability, sessions can be planned online or in person.'],
   ['Is this only for serious mental health concerns?', 'No. Many people seek support for stress, confusion, relationship difficulty, parenting concerns, academic pressure or emotional clarity.'],
   ['Can parents enquire for a child or teenager?', 'Yes. Parents can request guidance and the team can explain the next appropriate step.'],
@@ -1433,12 +1440,12 @@ function About() {
       </div>
       <div className="aboutCopyPanel">
         <p>
-          NeuroCogno helps people speak openly, understand patterns, and move toward practical wellbeing
+          NeuroCogno helps people speak openly, understand patterns, and move towards practical wellbeing
           through confidential counselling and psychological support.
         </p>
         <div className="aboutCareNotes" aria-label="NeuroCogno care approach">
           <span>Confidential first conversations</span>
-          <span>Support matched to the concern</span>
+          <span>Support matched to each person's concern</span>
           <span>Gentle follow-up without pressure</span>
         </div>
       </div>
@@ -1449,7 +1456,7 @@ function FounderStory() {
   return (
     <section className="founderStory section" aria-label="NeuroCogno founder story">
       <div className="founderPortrait">
-        <img src="/team/ceo-booking.jpeg" alt="NeuroCogno CEO and founder" />
+        <img src="/team/ceo-booking.jpeg" alt="NeuroCogno CEO and founder" className="objectFitFace" />
       </div>
       <div className="founderCopy">
         <p className="eyebrow">Founder’s note</p>
@@ -1470,6 +1477,7 @@ function AppointmentForm({ config, onLeadReady }) {
     name: '',
     phone: '',
     email: '',
+    age: '',
     ageGroup: '',
     reason: '',
     message: '',
@@ -1489,6 +1497,7 @@ function AppointmentForm({ config, onLeadReady }) {
         name: form.name,
         phone: form.phone,
         email: form.email,
+        age: form.age,
         ageGroup: form.ageGroup,
         reason: form.reason,
         message: form.message
@@ -1532,6 +1541,17 @@ function AppointmentForm({ config, onLeadReady }) {
       </div>
       <div className="fieldPair">
         <input placeholder="Email Address" value={form.email} onChange={(e) => update('email', e.target.value)} />
+        <input
+          type="number"
+          min="0"
+          max="120"
+          inputMode="numeric"
+          placeholder="Age"
+          value={form.age}
+          onChange={(e) => update('age', e.target.value)}
+        />
+      </div>
+      <div className="fieldPair">
         <select value={form.ageGroup} onChange={(e) => update('ageGroup', e.target.value)}>
           <option value="">Age Group</option>
           <option>Child</option>
@@ -1539,15 +1559,16 @@ function AppointmentForm({ config, onLeadReady }) {
           <option>Adult</option>
           <option>Senior</option>
         </select>
+        <select value={form.reason} onChange={(e) => update('reason', e.target.value)}>
+          <option value="">Reason for Consultation</option>
+          <option>Anxiety or stress</option>
+          <option>Relationship concern</option>
+          <option>Parent guidance</option>
+          <option>Academic pressure</option>
+          <option>Emotional wellbeing</option>
+          <option>Others</option>
+        </select>
       </div>
-      <select value={form.reason} onChange={(e) => update('reason', e.target.value)}>
-        <option value="">Reason for Consultation</option>
-        <option>Anxiety or stress</option>
-        <option>Relationship concern</option>
-        <option>Parent guidance</option>
-        <option>Academic pressure</option>
-        <option>Emotional wellbeing</option>
-      </select>
       <textarea placeholder="Your Message" value={form.message} onChange={(e) => update('message', e.target.value)} />
       <label className="consent">
         <input
@@ -3803,6 +3824,7 @@ function LeadTable({ items, onEdit, onConfirm, onArchive }) {
             <th>Alt Phone</th>
             <th>Email</th>
             <th>Age</th>
+            <th>Age Group</th>
             <th>Reason</th>
             <th>Message / Survey</th>
             <th>Status</th>
@@ -3820,6 +3842,7 @@ function LeadTable({ items, onEdit, onConfirm, onArchive }) {
               <td>{item.phone || '-'}</td>
               <td>{item.alternatePhone || '-'}</td>
               <td>{item.email || '-'}</td>
+              <td>{item.age || '-'}</td>
               <td>{item.ageGroup || '-'}</td>
               <td>{item.reason || '-'}</td>
               <td className="wideCell">
@@ -3925,6 +3948,7 @@ function LeadEditor({ item, onClose, onSave }) {
     alternatePhone: item.alternatePhone || '',
     email: item.email || '',
     alternateEmail: item.alternateEmail || '',
+    age: item.age || '',
     ageGroup: item.ageGroup || '',
     reason: item.reason || '',
     message: item.message || '',
@@ -3969,6 +3993,10 @@ function LeadEditor({ item, onClose, onSave }) {
           <label>
             Alternate Phone
             <input value={form.alternatePhone} onChange={(event) => update('alternatePhone', event.target.value)} />
+          </label>
+          <label>
+            Age
+            <input value={form.age} onChange={(event) => update('age', event.target.value)} />
           </label>
           <label>
             Email

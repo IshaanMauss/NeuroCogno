@@ -26,6 +26,7 @@ const leadSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     phone: { type: String, trim: true, default: '' },
     email: { type: String, trim: true, lowercase: true, default: '' },
+    age: { type: String, trim: true, default: '' },
     ageGroup: { type: String, trim: true, default: '' },
     reason: { type: String, trim: true, default: '' },
     message: { type: String, trim: true, default: '' },
