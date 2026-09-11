@@ -632,9 +632,7 @@ function Header({ contact, theme, onToggleTheme }) {
   }
 
   return (
-    <>
-      <RainOverlay />
-      <header className="siteHeader" ref={headerRef}>
+    <header className="siteHeader" ref={headerRef}>
       <Logo />
       <nav className="navLinks" aria-label="Main navigation">
         {navItems.map(([path, label, hash]) => {
@@ -713,8 +711,7 @@ function Header({ contact, theme, onToggleTheme }) {
           </div>,
           document.body
         )}
-      </header>
-    </>
+    </header>
   );
 }
 
@@ -922,56 +919,6 @@ function MiniCareScene({ type = 'counselling', className = '' }) {
     <svg className={`miniCareScene ${className}`} viewBox="0 0 156 120" aria-hidden="true" focusable="false">
       {scenes[type] || scenes.counselling}
     </svg>
-  );
-}
-
-function RainOverlay() {
-  const drops = useMemo(() => {
-    // A small deterministic PRNG (no external deps) so the drop layout is
-    // stable across re-renders instead of reshuffling every time a parent
-    // (Header) re-renders.
-    let seed = 42;
-    const rand = () => {
-      seed = (seed * 9301 + 49297) % 233280;
-      return seed / 233280;
-    };
-    const count = 46;
-    return Array.from({ length: count }, (_, index) => {
-      const depth = rand();
-      // Three loose depth bands: far/dim/slow, mid, near/bright/fast.
-      const isNear = depth > 0.75;
-      const isFar = depth < 0.35;
-      const length = isNear ? 70 + rand() * 55 : isFar ? 24 + rand() * 22 : 40 + rand() * 30;
-      const duration = isNear ? 0.55 + rand() * 0.25 : isFar ? 1.3 + rand() * 0.6 : 0.85 + rand() * 0.35;
-      const opacity = isNear ? 0.5 + rand() * 0.25 : isFar ? 0.16 + rand() * 0.12 : 0.28 + rand() * 0.16;
-      return {
-        id: index,
-        left: rand() * 100,
-        length,
-        duration,
-        delay: -rand() * duration * 4,
-        opacity
-      };
-    });
-  }, []);
-
-  return (
-    <div className="rainOverlay" aria-hidden="true">
-      <div className="rainMist" />
-      {drops.map((drop) => (
-        <span
-          key={drop.id}
-          className="rainDrop"
-          style={{
-            left: `${drop.left}%`,
-            height: `${drop.length}px`,
-            opacity: drop.opacity,
-            animationDuration: `${drop.duration}s`,
-            animationDelay: `${drop.delay}s`
-          }}
-        />
-      ))}
-    </div>
   );
 }
 
