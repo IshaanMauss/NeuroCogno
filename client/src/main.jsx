@@ -678,6 +678,18 @@ function Header({ contact, theme, onToggleTheme }) {
                 );
               })}
             </nav>
+            <div className="mobileMenuMore">
+              <span className="mobileMenuMoreLabel">More</span>
+              <nav className="mobileMenuLinks mobileMenuLinksSecondary" aria-label="More pages (mobile)">
+                {footerNavItems
+                  .filter(([path]) => path === '/neurocogno-insight' || path === '/workshops-events')
+                  .map(([path, label]) => (
+                    <button key={path} onClick={() => go(path)}>
+                      {label}
+                    </button>
+                  ))}
+              </nav>
+            </div>
             <div className="mobileMenuActions">
               <button className="primaryButton" onClick={goBookFromMenu}>
                 <CalendarDays size={18} />

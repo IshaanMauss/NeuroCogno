@@ -11643,3 +11643,153 @@ html[data-theme="dark"] .closeButton {
   border-color: rgba(210, 220, 131, 0.24) !important;
   color: #f2f7e4 !important;
 }
+
+/* ======================================================================
+   2026-09-11: Mobile scroll performance + a real mobile pass on the
+   Insight Hub content (was reading like scaled-down desktop copy), plus
+   a "More" row in the mobile menu so Insight Hub / Workshops & Events
+   are reachable without scrolling all the way to the footer.
+   ====================================================================== */
+
+@media (max-width: 900px) {
+  /* --- Scroll performance ---
+     backdrop-filter blur on elements that stay on screen while the page
+     scrolls (a sticky header, a sticky filter rail) forces the browser to
+     recompute the blur every frame, which is what makes scrolling feel
+     like dragging on mid-range phones. Swap those for a plain, near-opaque
+     background on mobile only - desktop keeps the blur. */
+  .siteHeader {
+    backdrop-filter: none !important;
+    background: rgba(255, 253, 247, 0.98) !important;
+  }
+  html[data-theme="dark"] .siteHeader {
+    background: rgba(18, 28, 22, 0.98) !important;
+  }
+  .insightFloatingRail {
+    backdrop-filter: none !important;
+  }
+
+  /* The photo-wall marquee auto-scrolls forever via a CSS animation that
+     only pauses on :hover - which never fires on a touch screen, so on
+     mobile it silently animates the whole time the section is in view,
+     competing with the browser for compositor time while the user
+     scrolls. Turn it into an ordinary swipeable strip on mobile instead. */
+  .marqueeTrack {
+    animation: none !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x proximity !important;
+  }
+  .marqueeCard {
+    scroll-snap-align: start !important;
+  }
+  .marqueeViewport {
+    mask-image: none !important;
+  }
+
+  /* Decorative shimmer on the hero's daily-insight chip - runs forever on
+     every page load; harmless on desktop, one more thing competing for
+     frame budget on mobile. */
+  .dailyInsightChip::before {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+
+/* --- Insight Hub: a real mobile pass instead of shrunk desktop copy --- */
+@media (max-width: 760px) {
+  .insightIntro h2,
+  .creativeCanvasIntro h3,
+  .marqueeHeader h2 {
+    font-size: clamp(1.6rem, 7vw, 2rem) !important;
+    line-height: 1.18 !important;
+  }
+
+  .insightIntro p,
+  .creativeCanvasIntro p,
+  .marqueeHeader p {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+  }
+
+  .marqueeCard {
+    width: 240px !important;
+    min-height: auto !important;
+    padding: 16px !important;
+  }
+  .marqueeCard span {
+    font-size: 13px !important;
+  }
+  .marqueeCard h3 {
+    font-size: 19px !important;
+    line-height: 1.3 !important;
+  }
+
+  .creativeFeature,
+  .creativeMini {
+    padding: 0 !important;
+  }
+  .creativeFeature > div,
+  .creativeMini > div {
+    padding: 16px !important;
+  }
+  .creativeFeature h4,
+  .creativeMini h4 {
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+  }
+  .creativeFeature p,
+  .creativeMini p {
+    font-size: 0.98rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .insightResourcePanel,
+  .videoLearningPanel {
+    padding: 18px !important;
+  }
+  .insightResourcePanel p,
+  .videoLearningPanel p {
+    font-size: 0.98rem !important;
+    line-height: 1.65 !important;
+  }
+
+  /* Give sections more breathing room between them - the tight spacing is
+     part of what read as "just a compacted desktop layout". */
+  .insightHub.section > * + * {
+    margin-top: 8px;
+  }
+  .marqueeSection,
+  .creativeTherapyCanvas,
+  .insightResourceSections,
+  .videoLearningPanel,
+  .insightVideoBoard {
+    margin-bottom: 12px !important;
+  }
+}
+
+/* --- Mobile menu: secondary "More" row for pages outside the primary nav --- */
+.mobileMenuMore {
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(95, 143, 196, 0.16);
+}
+.mobileMenuMoreLabel {
+  display: block;
+  margin-bottom: 6px;
+  padding: 0 16px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.8;
+}
+.mobileMenuLinksSecondary button {
+  font-size: 0.94rem !important;
+  font-weight: 550 !important;
+  opacity: 0.9;
+}
+html[data-theme="dark"] .mobileMenuMore {
+  border-top-color: rgba(210, 220, 131, 0.18);
+}
