@@ -11607,3 +11607,39 @@ html[data-theme="dark"] .creativeMini {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ======================================================================
+   2026-09-11: Fix survey popup being hidden behind the mobile sticky
+   header (header gets z-index:90 on mobile so its close button stays
+   above the slide-down nav menu, which accidentally also put it above
+   the survey popup at z-index:60), plus a cleaner, modern close button.
+   ====================================================================== */
+.surveyOverlay {
+  z-index: 2147483000 !important;
+}
+
+.closeButton {
+  min-width: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(95, 143, 196, 0.22) !important;
+  box-shadow: 0 8px 20px rgba(22, 42, 66, 0.16) !important;
+  color: #102942 !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  transition: transform 160ms ease, box-shadow 160ms ease !important;
+}
+.closeButton:hover {
+  transform: scale(1.06) !important;
+  box-shadow: 0 10px 24px rgba(22, 42, 66, 0.22) !important;
+}
+html[data-theme="dark"] .closeButton {
+  background: rgba(20, 33, 27, 0.92) !important;
+  border-color: rgba(210, 220, 131, 0.24) !important;
+  color: #f2f7e4 !important;
+}

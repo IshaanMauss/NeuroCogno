@@ -33,7 +33,23 @@ import {
 import { io } from 'socket.io-client';
 import './styles.css';
 
+// Primary header nav, per the client's requested order:
+// Home, About, Services, Collaboration, Who We Help, FAQs, Contact.
+// Entries are [path, label, hash?] - a hash scrolls to that section id on
+// the target page (most of these live on the /about-us "home" page).
 const navItems = [
+  ['/about-us', 'Home'],
+  ['/about-us', 'About', 'about-us'],
+  ['/about-us', 'Services', 'services'],
+  ['/collaborations', 'Collaboration'],
+  ['/about-us', 'Who We Help', 'who'],
+  ['/about-us', 'FAQs', 'faqs'],
+  ['/about-us', 'Contact', 'contact']
+];
+
+// Full site map for the footer's "Quick Links" - keeps NeuroCogno Insight and
+// Workshops & Events reachable even though they're not in the primary nav.
+const footerNavItems = [
   ['/about-us', 'About Us'],
   ['/neurocogno-insight', 'NeuroCogno Insight'],
   ['/workshops-events', 'Workshops & Events'],
@@ -546,7 +562,11 @@ function ThemeToggle({ theme, onToggle }) {
 
 function activeNavPath() {
   const currentPath = window.location.pathname === '/' ? '/about-us' : window.location.pathname;
-  return navItems.find(([path]) => currentPath === path || currentPath.startsWith(`${path}/`))?.[0] || '/about-us';
+  const currentHash = (window.location.hash || '').replace('#', '');
+  const byHash = navItems.find(([path, , hash]) => hash && currentPath === path && currentHash === hash);
+  if (byHash) return `${byHash[0]}#${byHash[2]}`;
+  const byPath = navItems.find(([path, , hash]) => !hash && (currentPath === path || currentPath.startsWith(`${path}/`)));
+  return byPath ? byPath[0] : '/about-us';
 }
 
 function Header({ contact, theme, onToggleTheme }) {
@@ -570,9 +590,9 @@ function Header({ contact, theme, onToggleTheme }) {
     };
   }, [menuOpen]);
 
-  function go(path) {
+  function go(path, hash) {
     setMenuOpen(false);
-    navigateTo(path);
+    navigateTo(path, hash ? { hash } : undefined);
   }
 
   function goBookFromMenu() {
@@ -584,14 +604,15 @@ function Header({ contact, theme, onToggleTheme }) {
     <header className="siteHeader">
       <Logo />
       <nav className="navLinks" aria-label="Main navigation">
-        {navItems.map(([path, label]) => {
-          const isActive = currentNavPath === path;
+        {navItems.map(([path, label, hash]) => {
+          const itemKey = hash ? `${path}#${hash}` : path;
+          const isActive = currentNavPath === itemKey;
           return (
             <button
-              key={path}
+              key={itemKey}
               className={isActive ? 'active' : ''}
               aria-current={isActive ? 'page' : undefined}
-              onClick={() => navigateTo(path)}
+              onClick={() => navigateTo(path, hash ? { hash } : undefined)}
             >
               {label}
             </button>
@@ -601,7 +622,7 @@ function Header({ contact, theme, onToggleTheme }) {
       <ThemeToggle theme={theme} onToggle={onToggleTheme} />
       <button className="primaryButton headerCta" onClick={goToBooking}>
         <CalendarDays size={18} />
-        Book Appointment
+        Book a session
       </button>
       <a className="mobileCall" href={`tel:${contact.ceoPhone}`} aria-label="Connect with NeuroCogno team">
         <Phone size={18} />
@@ -619,14 +640,15 @@ function Header({ contact, theme, onToggleTheme }) {
         createPortal(
           <div className="mobileMenuOverlay" role="dialog" aria-modal="true" aria-label="Site menu">
             <nav className="mobileMenuLinks" aria-label="Main navigation (mobile)">
-              {navItems.map(([path, label]) => {
-                const isActive = currentNavPath === path;
+              {navItems.map(([path, label, hash]) => {
+                const itemKey = hash ? `${path}#${hash}` : path;
+                const isActive = currentNavPath === itemKey;
                 return (
                   <button
-                    key={path}
+                    key={itemKey}
                     className={isActive ? 'active' : ''}
                     aria-current={isActive ? 'page' : undefined}
-                    onClick={() => go(path)}
+                    onClick={() => go(path, hash)}
                   >
                     {label}
                   </button>
@@ -636,7 +658,7 @@ function Header({ contact, theme, onToggleTheme }) {
             <div className="mobileMenuActions">
               <button className="primaryButton" onClick={goBookFromMenu}>
                 <CalendarDays size={18} />
-                Book Appointment
+                Book a session
               </button>
               <a className="outlineButton mobileMenuCall" href={`tel:${contact.ceoPhone}`} onClick={() => setMenuOpen(false)}>
                 <Phone size={18} />
@@ -2224,7 +2246,7 @@ function Footer({ contact }) {
       </div>
       <div>
         <h3>Quick Links</h3>
-        {navItems.map(([path, label]) => (
+        {footerNavItems.map(([path, label]) => (
           <button key={path} onClick={() => navigateTo(path)}>
             {label}
           </button>
