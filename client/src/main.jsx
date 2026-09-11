@@ -555,7 +555,15 @@ function ThemeToggle({ theme, onToggle }) {
       aria-label={isDark ? 'Switch to day mode' : 'Switch to night mode'}
       title={isDark ? 'Day mode' : 'Night mode'}
     >
-      <span className="themeToggleOrb">{isDark ? <Moon size={15} /> : <Sun size={15} />}</span>
+      <span className="themeToggleTwinkle" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+      <span className="themeToggleOrb">
+        <Sun className="themeToggleIcon themeToggleIcon--sun" size={13} />
+        <Moon className="themeToggleIcon themeToggleIcon--moon" size={13} />
+      </span>
     </button>
   );
 }
@@ -914,6 +922,73 @@ function MiniCareScene({ type = 'counselling', className = '' }) {
   );
 }
 
+function PeaceSigilMark({ className = 'peaceSigil' }) {
+  return (
+    <svg className={className} viewBox="0 0 520 620" aria-hidden="true">
+      <g className="sigilGlow" fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path className="sigilPath sigilBase" pathLength="1" d="M130 560 H390" />
+        <path className="sigilPath sigilStem" pathLength="1" d="M260 560 L260 106" />
+        <path className="sigilPath sigilSide sigilLeftSide" pathLength="1" d="M260 106 L150 296 C104 372 116 432 156 462 C190 487 226 500 260 503" />
+        <path className="sigilPath sigilSide sigilRightSide" pathLength="1" d="M260 106 L370 296 C416 372 404 432 364 462 C330 487 294 500 260 503" />
+        <path
+          className="sigilPath sigilBowl sigilLeftBowl"
+          pathLength="1"
+          d="M84 338 A112 112 0 1 0 308 338 A112 112 0 1 0 84 338"
+        />
+        <path
+          className="sigilPath sigilBowl sigilRightBowl"
+          pathLength="1"
+          d="M212 338 A112 112 0 1 0 436 338 A112 112 0 1 0 212 338"
+        />
+        <path
+          className="sigilPath sigilCurl sigilLeftCurl"
+          pathLength="1"
+          transform="translate(196,338) scale(1.55) translate(-206.5,-314.5)"
+          d="M260 376 C225 391 177 370 164 326 C151 280 180 238 222 244 C262 250 281 294 254 326 C235 349 202 345 192 321"
+        />
+        <path
+          className="sigilPath sigilCurl sigilRightCurl"
+          pathLength="1"
+          transform="translate(324,338) scale(1.55) translate(-313.5,-314.5)"
+          d="M260 376 C295 391 343 370 356 326 C369 280 340 238 298 244 C258 250 239 294 266 326 C285 349 318 345 328 321"
+        />
+        <circle className="sigilDot" cx="260" cy="98" r="16" />
+      </g>
+    </svg>
+  );
+}
+
+const sigilFieldSpots = [
+  { top: '6%', left: '4%', size: 34, delay: 0 },
+  { top: '14%', left: '86%', size: 46, delay: 0.35 },
+  { top: '46%', left: '93%', size: 30, delay: 0.7 },
+  { top: '72%', left: '3%', size: 28, delay: 1.05 },
+  { top: '88%', left: '80%', size: 40, delay: 1.4 },
+  { top: '38%', left: '46%', size: 22, delay: 1.75 }
+];
+
+function SigilField() {
+  return (
+    <div className="sigilField" aria-hidden="true">
+      {sigilFieldSpots.map((spot, index) => (
+        <span
+          key={index}
+          className={`sigilStar sigilStar--${index}`}
+          style={{
+            top: spot.top,
+            left: spot.left,
+            width: `${spot.size}px`,
+            height: `${spot.size}px`,
+            animationDelay: `${spot.delay}s, ${spot.delay + 1.2}s`
+          }}
+        >
+          <PeaceSigilMark className="peaceSigilMini" />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function Hero({ contact, content = [], onOpenSurvey }) {
   const heroImage = mediaByKey(content, 'homepage.hero.image');
   const [heroImageFailed, setHeroImageFailed] = useState(false);
@@ -925,20 +1000,8 @@ function Hero({ contact, content = [], onOpenSurvey }) {
 
   return (
     <section className="hero section" id="home">
+      <SigilField />
       <div className="heroCopy">
-      <svg className="peaceSigil" viewBox="0 0 520 620" aria-hidden="true">
-        <g className="sigilGlow" fill="none" strokeLinecap="round" strokeLinejoin="round">
-          <path className="sigilPath sigilBase" pathLength="1" d="M112 542 H408" />
-          <path className="sigilPath sigilStem" pathLength="1" d="M260 542 L260 110" />
-          <path className="sigilPath sigilSide sigilLeftSide" pathLength="1" d="M260 110 C232 149 190 191 155 244 C118 300 107 374 139 431 C164 477 208 504 260 508" />
-          <path className="sigilPath sigilSide sigilRightSide" pathLength="1" d="M260 110 C288 149 330 191 365 244 C402 300 413 374 381 431 C356 477 312 504 260 508" />
-          <path className="sigilPath sigilBowl sigilLeftBowl" pathLength="1" d="M130 354 C151 427 206 461 260 459" />
-          <path className="sigilPath sigilBowl sigilRightBowl" pathLength="1" d="M390 354 C369 427 314 461 260 459" />
-          <path className="sigilPath sigilCurl sigilLeftCurl" pathLength="1" d="M260 376 C225 391 177 370 164 326 C151 280 180 238 222 244 C262 250 281 294 254 326 C235 349 202 345 192 321" />
-          <path className="sigilPath sigilCurl sigilRightCurl" pathLength="1" d="M260 376 C295 391 343 370 356 326 C369 280 340 238 298 244 C258 250 239 294 266 326 C285 349 318 345 328 321" />
-          <circle className="sigilDot" cx="260" cy="100" r="18" />
-        </g>
-      </svg>
         <p className="eyebrow heroKicker">Every Mind Matters, Every Journey Counts</p>
         <p className="eyebrow">{contentByKey(content, 'homepage.hero.eyebrow', 'Compassionate. Confidential. Caring.')}</p>
         <h1>
