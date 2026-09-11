@@ -572,6 +572,29 @@ function activeNavPath() {
 function Header({ contact, theme, onToggleTheme }) {
   const currentNavPath = activeNavPath();
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    // Keep a CSS var in sync with the header's *real* rendered height, so
+    // the mobile menu overlay (which starts right below the header) never
+    // drifts out of sync with it - the header's height isn't a fixed
+    // number: it changes with logo size, font loading, and text wrapping
+    // (e.g. the eyebrow kicker line), and a stale hardcoded fallback here
+    // previously let the header cover the first nav item(s).
+    const el = headerRef.current;
+    if (!el) return undefined;
+    const setVar = () => {
+      document.documentElement.style.setProperty('--header-h', `${el.offsetHeight}px`);
+    };
+    setVar();
+    const observer = new ResizeObserver(setVar);
+    observer.observe(el);
+    window.addEventListener('resize', setVar);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', setVar);
+    };
+  }, []);
 
   useEffect(() => {
     // Close the mobile menu automatically on any route change (nav click,
@@ -601,7 +624,7 @@ function Header({ contact, theme, onToggleTheme }) {
   }
 
   return (
-    <header className="siteHeader">
+    <header className="siteHeader" ref={headerRef}>
       <Logo />
       <nav className="navLinks" aria-label="Main navigation">
         {navItems.map(([path, label, hash]) => {
