@@ -632,7 +632,9 @@ function Header({ contact, theme, onToggleTheme }) {
   }
 
   return (
-    <header className="siteHeader" ref={headerRef}>
+    <>
+      <RainOverlay />
+      <header className="siteHeader" ref={headerRef}>
       <Logo />
       <nav className="navLinks" aria-label="Main navigation">
         {navItems.map(([path, label, hash]) => {
@@ -711,7 +713,8 @@ function Header({ contact, theme, onToggleTheme }) {
           </div>,
           document.body
         )}
-    </header>
+      </header>
+    </>
   );
 }
 
@@ -922,68 +925,51 @@ function MiniCareScene({ type = 'counselling', className = '' }) {
   );
 }
 
-function PeaceSigilMark({ className = 'peaceSigil' }) {
-  return (
-    <svg className={className} viewBox="0 0 520 620" aria-hidden="true">
-      <g className="sigilGlow" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path className="sigilPath sigilBase" pathLength="1" d="M130 560 H390" />
-        <path className="sigilPath sigilStem" pathLength="1" d="M260 560 L260 106" />
-        <path className="sigilPath sigilSide sigilLeftSide" pathLength="1" d="M260 106 L150 296 C104 372 116 432 156 462 C190 487 226 500 260 503" />
-        <path className="sigilPath sigilSide sigilRightSide" pathLength="1" d="M260 106 L370 296 C416 372 404 432 364 462 C330 487 294 500 260 503" />
-        <path
-          className="sigilPath sigilBowl sigilLeftBowl"
-          pathLength="1"
-          d="M84 338 A112 112 0 1 0 308 338 A112 112 0 1 0 84 338"
-        />
-        <path
-          className="sigilPath sigilBowl sigilRightBowl"
-          pathLength="1"
-          d="M212 338 A112 112 0 1 0 436 338 A112 112 0 1 0 212 338"
-        />
-        <path
-          className="sigilPath sigilCurl sigilLeftCurl"
-          pathLength="1"
-          transform="translate(196,338) scale(1.55) translate(-206.5,-314.5)"
-          d="M260 376 C225 391 177 370 164 326 C151 280 180 238 222 244 C262 250 281 294 254 326 C235 349 202 345 192 321"
-        />
-        <path
-          className="sigilPath sigilCurl sigilRightCurl"
-          pathLength="1"
-          transform="translate(324,338) scale(1.55) translate(-313.5,-314.5)"
-          d="M260 376 C295 391 343 370 356 326 C369 280 340 238 298 244 C258 250 239 294 266 326 C285 349 318 345 328 321"
-        />
-        <circle className="sigilDot" cx="260" cy="98" r="16" />
-      </g>
-    </svg>
-  );
-}
+function RainOverlay() {
+  const drops = useMemo(() => {
+    // A small deterministic PRNG (no external deps) so the drop layout is
+    // stable across re-renders instead of reshuffling every time a parent
+    // (Header) re-renders.
+    let seed = 42;
+    const rand = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+    const count = 46;
+    return Array.from({ length: count }, (_, index) => {
+      const depth = rand();
+      // Three loose depth bands: far/dim/slow, mid, near/bright/fast.
+      const isNear = depth > 0.75;
+      const isFar = depth < 0.35;
+      const length = isNear ? 70 + rand() * 55 : isFar ? 24 + rand() * 22 : 40 + rand() * 30;
+      const duration = isNear ? 0.55 + rand() * 0.25 : isFar ? 1.3 + rand() * 0.6 : 0.85 + rand() * 0.35;
+      const opacity = isNear ? 0.5 + rand() * 0.25 : isFar ? 0.16 + rand() * 0.12 : 0.28 + rand() * 0.16;
+      return {
+        id: index,
+        left: rand() * 100,
+        length,
+        duration,
+        delay: -rand() * duration * 4,
+        opacity
+      };
+    });
+  }, []);
 
-const sigilFieldSpots = [
-  { top: '6%', left: '4%', size: 34, delay: 0 },
-  { top: '14%', left: '86%', size: 46, delay: 0.35 },
-  { top: '46%', left: '93%', size: 30, delay: 0.7 },
-  { top: '72%', left: '3%', size: 28, delay: 1.05 },
-  { top: '88%', left: '80%', size: 40, delay: 1.4 },
-  { top: '38%', left: '46%', size: 22, delay: 1.75 }
-];
-
-function SigilField() {
   return (
-    <div className="sigilField" aria-hidden="true">
-      {sigilFieldSpots.map((spot, index) => (
+    <div className="rainOverlay" aria-hidden="true">
+      <div className="rainMist" />
+      {drops.map((drop) => (
         <span
-          key={index}
-          className={`sigilStar sigilStar--${index}`}
+          key={drop.id}
+          className="rainDrop"
           style={{
-            top: spot.top,
-            left: spot.left,
-            width: `${spot.size}px`,
-            height: `${spot.size}px`,
-            animationDelay: `${spot.delay}s, ${spot.delay + 1.2}s`
+            left: `${drop.left}%`,
+            height: `${drop.length}px`,
+            opacity: drop.opacity,
+            animationDuration: `${drop.duration}s`,
+            animationDelay: `${drop.delay}s`
           }}
-        >
-          <PeaceSigilMark className="peaceSigilMini" />
-        </span>
+        />
       ))}
     </div>
   );
@@ -1000,7 +986,6 @@ function Hero({ contact, content = [], onOpenSurvey }) {
 
   return (
     <section className="hero section" id="home">
-      <SigilField />
       <div className="heroCopy">
         <p className="eyebrow heroKicker">Every Mind Matters, Every Journey Counts</p>
         <p className="eyebrow">{contentByKey(content, 'homepage.hero.eyebrow', 'Compassionate. Confidential. Caring.')}</p>
