@@ -11548,7 +11548,8 @@ html[data-theme="dark"] .closeButton {
   html[data-theme="dark"] .siteHeader {
     background: rgba(18, 28, 22, 0.98) !important;
   }
-  .insightFloatingRail {
+  .insightFloatingRail,
+  .insightFloatingRail button {
     backdrop-filter: none !important;
   }
 
