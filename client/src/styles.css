@@ -11808,13 +11808,15 @@ html[data-theme="dark"] .cmsGuidanceBox {
     background: rgba(111, 155, 130, 0.1);
     color: var(--ink, #1f2a24);
     flex-shrink: 0;
+    position: relative;
+    z-index: 2147483601 !important;
   }
 
   .mobileMenuOverlay {
     position: fixed;
     inset: 0;
     top: var(--header-h, 76px);
-    z-index: 60;
+    z-index: 2147483600 !important;
     background: var(--surface, #fff);
     display: flex;
     flex-direction: column;

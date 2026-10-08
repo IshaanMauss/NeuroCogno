@@ -4535,7 +4535,7 @@ function useHashScroll() {
   }, [window.location.pathname, window.location.hash]);
 }
 
-function SiteLayout({ config, theme, onToggleTheme, children, onSurveyLeadReady, footerSlot, surveyOpenSignal }) {
+function SiteLayout({ config, theme, onToggleTheme, children, onSurveyLeadReady, footerSlot, surveyOpenSignal, showFloatingBubbles = false }) {
   const [appointmentOpen, setAppointmentOpen] = useState(false);
 
   useEffect(() => {
@@ -4548,8 +4548,12 @@ function SiteLayout({ config, theme, onToggleTheme, children, onSurveyLeadReady,
     <>
       <Header contact={config.contact} theme={theme} onToggleTheme={onToggleTheme} />
       <main>{children}</main>
-      <AnnouncementPanel />
-      <CrisisSupportPanel contact={config.contact} />
+      {showFloatingBubbles && (
+        <>
+          <AnnouncementPanel />
+          <CrisisSupportPanel contact={config.contact} />
+        </>
+      )}
       {footerSlot}
       <Footer contact={config.contact} />
       {onSurveyLeadReady && <SurveyPopup config={config} onLeadReady={onSurveyLeadReady} openSignal={surveyOpenSignal} />}
@@ -4573,7 +4577,14 @@ function AboutUsPage({ theme, onToggleTheme }) {
   const [pendingLead, setPendingLead] = useState('');
 
   return (
-    <SiteLayout config={config} theme={theme} onToggleTheme={onToggleTheme} onSurveyLeadReady={setPendingLead} footerSlot={<FounderStory />}>
+    <SiteLayout
+      config={config}
+      theme={theme}
+      onToggleTheme={onToggleTheme}
+      onSurveyLeadReady={setPendingLead}
+      footerSlot={<FounderStory />}
+      showFloatingBubbles
+    >
       <HomeSectionRail />
       <Hero contact={config.contact} content={homepageContent} />
       <About />
