@@ -130,10 +130,19 @@ export function adminSeedUsers() {
 // CLIENT_ORIGIN alone when no comma is present, so default single-origin
 // setups are unaffected.
 export function allowedClientOrigins() {
-  return String(env.CLIENT_ORIGIN || '')
+  const configuredOrigins = String(env.CLIENT_ORIGIN || '')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+
+  return [
+    ...new Set([
+      ...configuredOrigins,
+      env.PUBLIC_BASE_URL,
+      `http://127.0.0.1:${env.PORT}`,
+      `http://localhost:${env.PORT}`
+    ].filter(Boolean))
+  ];
 }
 
 export function cloudinaryConfigured() {

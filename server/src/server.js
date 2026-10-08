@@ -20,7 +20,6 @@ import { setSocketServer } from './services/realtime.js';
 import { authRoutes } from './routes/authRoutes.js';
 import { publicRoutes } from './routes/publicRoutes.js';
 import { adminRoutes } from './routes/adminRoutes.js';
-import { paymentRoutes } from './routes/paymentRoutes.js';
 import { profileRoutes } from './routes/profileRoutes.js';
 import { devRoutes } from './routes/devRoutes.js';
 import { notFound, errorHandler, setupProcessErrorHandlers } from './middleware/errorHandler.js';
@@ -120,11 +119,11 @@ app.use(
       ? {
           directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", 'https://checkout.razorpay.com'],
+            scriptSrc: ["'self'"],
             connectSrc: ["'self'", ...allowedClientOrigins()],
             imgSrc: ["'self'", 'data:', 'https:', 'https://i.ytimg.com'],
             styleSrc: ["'self'", "'unsafe-inline'"],
-            frameSrc: ['https://api.razorpay.com', 'https://checkout.razorpay.com', 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
+            frameSrc: ['https://www.youtube.com', 'https://www.youtube-nocookie.com'],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: []
           }
@@ -227,7 +226,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/payments', paymentRoutes);
+// Online payments are intentionally disabled for now.
 app.use('/api/profile', profileRoutes); // User profile routes
 if (!isProduction) {
   app.use('/api/dev', devRoutes); // Developer debugging routes

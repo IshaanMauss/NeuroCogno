@@ -5954,6 +5954,642 @@ html[data-theme="dark"] .founderCopy p:last-child {
   }
 }
 
+/* Floating announcement launcher replaces the previous homepage cards. */
+.floatingAnnouncement {
+  position: fixed;
+  left: clamp(42px, 4vw, 72px);
+  top: 44%;
+  z-index: 2147482500;
+  display: grid;
+  gap: 14px;
+  align-items: center;
+  pointer-events: none;
+}
+
+.announcementOrb,
+.announcementDrawer {
+  pointer-events: auto;
+}
+
+.announcementOrb {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 116px;
+  height: 116px;
+  padding: 18px 12px 16px;
+  border: 1px solid rgba(181, 85, 111, 0.25);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.2) 28%, transparent 38%),
+    linear-gradient(145deg, #fff8fb, #dff7ff 48%, #c5efd8);
+  color: #173149;
+  box-shadow:
+    inset -10px -12px 24px rgba(16, 41, 66, 0.12),
+    inset 8px 9px 18px rgba(255, 255, 255, 0.76),
+    0 18px 42px rgba(32, 86, 120, 0.24);
+  cursor: pointer;
+  animation: announcementFloat 4.4s ease-in-out infinite;
+}
+
+.announcementOrb::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  z-index: -1;
+  border-radius: inherit;
+  border: 1px solid rgba(181, 85, 111, 0.18);
+  opacity: 0.78;
+  animation: announcementPulse 2.6s ease-out infinite;
+}
+
+.announcementOrb svg {
+  color: #b5556f;
+  filter: drop-shadow(0 4px 8px rgba(181, 85, 111, 0.24));
+}
+
+.announcementOrb strong {
+  display: block;
+  width: 100%;
+  max-width: 94px;
+  color: inherit;
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  overflow-wrap: normal;
+  white-space: normal;
+}
+
+.announcementOrbGlow {
+  position: absolute;
+  inset: 12px;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.72), transparent 66%);
+  transform: translate(-10px, -12px);
+}
+
+@keyframes announcementFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+@keyframes announcementPulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  80%, 100% { transform: scale(1.25); opacity: 0; }
+}
+
+.announcementDrawer {
+  position: absolute;
+  left: 118px;
+  top: 50%;
+  width: min(360px, calc(100vw - 150px));
+  max-height: min(72vh, 560px);
+  overflow: auto;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(95, 143, 196, 0.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(244, 253, 255, 0.96)),
+    radial-gradient(circle at 100% 0%, rgba(197, 239, 216, 0.4), transparent 120px);
+  box-shadow: 0 24px 70px rgba(16, 41, 66, 0.22);
+  transform: translateY(-50%);
+  animation: announcementDrawerIn 180ms ease-out;
+}
+
+@keyframes announcementDrawerIn {
+  from { opacity: 0; transform: translate(-10px, -50%) scale(0.98); }
+  to { opacity: 1; transform: translate(0, -50%) scale(1); }
+}
+
+.announcementDrawerHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  align-items: start;
+}
+
+.announcementDrawerHeader .eyebrow {
+  grid-column: 1;
+  margin: 0;
+}
+
+.announcementDrawerHeader h2 {
+  grid-column: 1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.1;
+}
+
+.announcementDrawerHeader button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(95, 143, 196, 0.22);
+  border-radius: 50%;
+  background: #fff;
+  color: #173149;
+  cursor: pointer;
+}
+
+.announcementLead {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.announcementDrawerList {
+  display: grid;
+  gap: 12px;
+}
+
+.announcementDrawerList button {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+  border: 1px solid rgba(95, 143, 196, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.announcementDrawerList span {
+  color: #b5556f;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.announcementDrawerList strong {
+  color: var(--ink);
+}
+
+.announcementDrawerList p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.announcementDrawerList small {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(181, 85, 111, 0.1);
+  color: #b5556f;
+  font-weight: 900;
+}
+
+html[data-theme="dark"] .announcementOrb {
+  color: #eef7f8;
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.05) 30%, transparent 42%),
+    linear-gradient(145deg, #1d3241, #203d4c 48%, #33594f);
+  border-color: rgba(169, 224, 255, 0.24);
+}
+
+html[data-theme="dark"] .announcementDrawer {
+  background: linear-gradient(145deg, rgba(20, 32, 44, 0.98), rgba(18, 31, 38, 0.98)) !important;
+  border-color: rgba(190, 222, 232, 0.18);
+}
+
+html[data-theme="dark"] .announcementDrawerHeader h2,
+html[data-theme="dark"] .announcementDrawerList strong {
+  color: #f6fbfc !important;
+}
+
+html[data-theme="dark"] .announcementLead,
+html[data-theme="dark"] .announcementDrawerList p {
+  color: #d7e6ea !important;
+}
+
+html[data-theme="dark"] .announcementDrawerHeader button,
+html[data-theme="dark"] .announcementDrawerList button {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(190, 222, 232, 0.22);
+  color: #f6fbfc;
+}
+
+@media (max-width: 700px) {
+  .floatingAnnouncement {
+    top: auto;
+    left: 16px;
+    bottom: 104px;
+  }
+
+  .announcementOrb {
+    width: 96px;
+    height: 96px;
+    padding: 14px 10px 12px;
+    gap: 5px;
+  }
+
+  .announcementOrb strong {
+    max-width: 78px;
+    font-size: 8.4px;
+  }
+
+  .announcementDrawer {
+    left: 0;
+    top: auto;
+    bottom: 100px;
+    width: min(340px, calc(100vw - 24px));
+    transform: none;
+  }
+
+  @keyframes announcementDrawerIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+}
+
+/* Floating crisis support launcher mirrors the announcement orb on the right. */
+.floatingCrisis {
+  position: fixed;
+  right: clamp(10px, 2vw, 24px);
+  top: 34%;
+  z-index: 2147482500;
+  display: grid;
+  gap: 14px;
+  align-items: center;
+  pointer-events: none;
+}
+
+.crisisOrb,
+.crisisDrawer {
+  pointer-events: auto;
+}
+
+.crisisOrb {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 116px;
+  height: 116px;
+  padding: 18px 12px 16px;
+  border: 1px solid rgba(171, 64, 88, 0.26);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.2) 28%, transparent 38%),
+    linear-gradient(145deg, #fff7f8, #ffe6ec 48%, #dff7ff);
+  color: #173149;
+  box-shadow:
+    inset -10px -12px 24px rgba(92, 29, 52, 0.12),
+    inset 8px 9px 18px rgba(255, 255, 255, 0.78),
+    0 18px 42px rgba(92, 29, 52, 0.18);
+  cursor: pointer;
+  animation: crisisFloat 4.8s ease-in-out infinite;
+}
+
+.crisisOrb::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  z-index: -1;
+  border-radius: inherit;
+  border: 1px solid rgba(171, 64, 88, 0.16);
+  opacity: 0.72;
+  animation: crisisPulse 2.8s ease-out infinite;
+}
+
+.crisisOrb svg {
+  color: #b23a5a;
+  filter: drop-shadow(0 4px 8px rgba(178, 58, 90, 0.24));
+}
+
+.crisisOrb strong {
+  display: block;
+  width: 100%;
+  max-width: 86px;
+  color: inherit;
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  white-space: normal;
+}
+
+.crisisOrbGlow {
+  position: absolute;
+  inset: 12px;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.72), transparent 66%);
+  transform: translate(10px, -12px);
+}
+
+@keyframes crisisFloat {
+  0%, 100% { transform: translateY(0) rotate(2deg); }
+  50% { transform: translateY(-12px) rotate(-2deg); }
+}
+
+@keyframes crisisPulse {
+  0% { transform: scale(0.9); opacity: 0.66; }
+  80%, 100% { transform: scale(1.25); opacity: 0; }
+}
+
+.crisisDrawer {
+  position: absolute;
+  right: 118px;
+  top: 50%;
+  width: min(380px, calc(100vw - 150px));
+  max-height: min(74vh, 590px);
+  overflow: auto;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(171, 64, 88, 0.18);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 230, 236, 0.72), transparent 140px),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 249, 0.96));
+  box-shadow: 0 24px 70px rgba(92, 29, 52, 0.2);
+  transform: translateY(-50%);
+  animation: crisisDrawerIn 180ms ease-out;
+}
+
+@keyframes crisisDrawerIn {
+  from { opacity: 0; transform: translate(10px, -50%) scale(0.98); }
+  to { opacity: 1; transform: translate(0, -50%) scale(1); }
+}
+
+.crisisDrawerHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  align-items: start;
+}
+
+.crisisDrawerHeader .eyebrow {
+  grid-column: 1;
+  margin: 0;
+}
+
+.crisisDrawerHeader h2 {
+  grid-column: 1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.1;
+}
+
+.crisisDrawerHeader button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(171, 64, 88, 0.2);
+  border-radius: 50%;
+  background: #fff;
+  color: #173149;
+  cursor: pointer;
+}
+
+.crisisLead {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.crisisDrawerList {
+  display: grid;
+  gap: 12px;
+}
+
+.crisisDrawerList article {
+  display: grid;
+  gap: 7px;
+  padding: 16px;
+  border: 1px solid rgba(171, 64, 88, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.crisisDrawerList span {
+  color: #b23a5a;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.crisisDrawerList a,
+.crisisDrawerList strong {
+  color: var(--ink);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.crisisDrawerList p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+html[data-theme="dark"] .crisisOrb {
+  color: #fff7f8;
+  background:
+    radial-gradient(circle at 32% 22%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05) 30%, transparent 42%),
+    linear-gradient(145deg, #3d2230, #462a38 48%, #273b49);
+  border-color: rgba(255, 198, 211, 0.24);
+}
+
+html[data-theme="dark"] .crisisDrawer {
+  background: linear-gradient(145deg, rgba(36, 24, 32, 0.98), rgba(20, 32, 44, 0.98)) !important;
+  border-color: rgba(255, 198, 211, 0.18);
+}
+
+html[data-theme="dark"] .crisisDrawerHeader h2,
+html[data-theme="dark"] .crisisDrawerList a,
+html[data-theme="dark"] .crisisDrawerList strong {
+  color: #fff7f8 !important;
+}
+
+html[data-theme="dark"] .crisisLead,
+html[data-theme="dark"] .crisisDrawerList p {
+  color: #ead6dc !important;
+}
+
+html[data-theme="dark"] .crisisDrawerHeader button,
+html[data-theme="dark"] .crisisDrawerList article {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 198, 211, 0.2);
+  color: #fff7f8;
+}
+
+@media (max-width: 900px) {
+  .floatingCrisis {
+    top: 30%;
+    right: 12px;
+  }
+
+  .crisisOrb {
+    width: 104px;
+    height: 104px;
+    padding: 15px 10px 13px;
+  }
+}
+
+@media (max-width: 700px) {
+  .floatingCrisis {
+    top: auto;
+    right: 12px;
+    bottom: 92px;
+  }
+
+  .crisisOrb {
+    width: 96px;
+    height: 96px;
+    padding: 14px 10px 12px;
+    gap: 5px;
+  }
+
+  .crisisOrb strong {
+    max-width: 72px;
+    font-size: 8.4px;
+  }
+
+  .crisisDrawer {
+    right: 0;
+    top: auto;
+    bottom: 100px;
+    width: min(340px, calc(100vw - 24px));
+    max-height: min(70vh, 520px);
+    transform: none;
+  }
+
+  @keyframes crisisDrawerIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+}
+
+.homeSectionRail {
+  position: fixed;
+  left: clamp(48px, 4.5vw, 78px);
+  top: 68%;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: max-content;
+  max-width: min(190px, 24vw);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.homeSectionRail button {
+  pointer-events: auto;
+  width: max-content;
+  max-width: 100%;
+  padding: 8px 13px;
+  border: 1px solid rgba(83, 128, 155, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #21465a;
+  box-shadow: 0 10px 24px rgba(32, 86, 120, 0.12);
+  backdrop-filter: blur(12px) saturate(1.08);
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0.78;
+  transition: transform 160ms ease, opacity 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.homeSectionRail button:hover,
+.homeSectionRail button:focus-visible {
+  opacity: 1;
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 34px rgba(32, 86, 120, 0.18);
+}
+
+html[data-theme="dark"] .homeSectionRail button {
+  border-color: rgba(190, 222, 232, 0.2);
+  background: rgba(20, 32, 44, 0.78);
+  color: #eef7f8;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
+}
+
+html[data-theme="dark"] .homeSectionRail button:hover,
+html[data-theme="dark"] .homeSectionRail button:focus-visible {
+  background: rgba(28, 48, 60, 0.96);
+}
+
+@media (max-width: 1120px) {
+  .homeSectionRail {
+    left: 42px;
+    max-width: 160px;
+  }
+
+  .homeSectionRail button {
+    padding: 7px 10px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 820px) {
+  .homeSectionRail {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 12px;
+    flex-direction: row;
+    max-width: none;
+    overflow-x: auto;
+    padding: 6px;
+    border: 1px solid rgba(83, 128, 155, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 12px 30px rgba(32, 86, 120, 0.12);
+    transform: none;
+    scrollbar-width: none;
+  }
+
+  .homeSectionRail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .homeSectionRail button {
+    flex: 0 0 auto;
+    opacity: 0.94;
+  }
+
+  .homeSectionRail button:hover,
+  .homeSectionRail button:focus-visible {
+    transform: translateY(-1px);
+  }
+
+  html[data-theme="dark"] .homeSectionRail {
+    background: rgba(20, 32, 44, 0.64);
+    border-color: rgba(190, 222, 232, 0.16);
+  }
+}
+
 /* Founder canvas placed where the removed explore-links block was */
 .founderStory {
   margin: clamp(34px, 5vw, 64px) auto !important;
@@ -11332,8 +11968,7 @@ html[data-theme="dark"] .logoMark {
 }
 
 /* --- Footer: guarantee readable text in dark mode ---
-   (client screenshot showed the footer's logo tagline, "Quick Links"
-   heading, nav links, and Contact Us block with invisible text over the
+   (client screenshot showed footer text blocks with invisible text over the
    dark footer background.) */
 html[data-theme="dark"] .footer {
   background: linear-gradient(135deg, #14202c, #1d2b34) !important;
@@ -11676,4 +12311,998 @@ html[data-theme="dark"] .closeButton {
 }
 html[data-theme="dark"] .mobileMenuMore {
   border-top-color: rgba(210, 220, 131, 0.18);
+}
+
+/* ======================================================================
+   2026-09-30: Final specification pass - nav alignment, dark header,
+   founders, announcements/news, crisis support, blog modal, footer fit,
+   centralized forms, and reliable FAQ behavior.
+   ====================================================================== */
+
+.navLinks button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: max-content !important;
+  min-width: 0 !important;
+  padding-inline: 2px !important;
+}
+
+.navLinks button.active::after,
+.navLinks button[aria-current="page"]::after {
+  left: 50% !important;
+  width: min(28px, 72%) !important;
+  transform: translateX(-50%) !important;
+}
+
+html[data-theme="dark"] .siteHeader {
+  background: rgba(16, 32, 44, 0.98) !important;
+  border-bottom-color: rgba(190, 222, 232, 0.22) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28) !important;
+}
+
+html[data-theme="dark"] .siteHeader .logoButton,
+html[data-theme="dark"] .siteHeader .logoButton small,
+html[data-theme="dark"] .siteHeader .navLinks button {
+  color: #eef7f8 !important;
+}
+
+html[data-theme="dark"] .siteHeader .navLinks button:hover,
+html[data-theme="dark"] .siteHeader .navLinks button.active,
+html[data-theme="dark"] .siteHeader .navLinks button[aria-current="page"] {
+  color: #a9e0ff !important;
+}
+
+html[data-theme="dark"] .siteHeader .navLinks button.active::after,
+html[data-theme="dark"] .siteHeader .navLinks button[aria-current="page"]::after {
+  background: linear-gradient(90deg, #a9e0ff, #c5efd8) !important;
+  box-shadow: 0 0 14px rgba(169, 224, 255, 0.45) !important;
+}
+
+html[data-theme="dark"] .siteHeader .headerCta {
+  color: #10202c !important;
+  background: linear-gradient(135deg, #a9e0ff, #c5efd8) !important;
+}
+
+.announcementStrip,
+.foundersSection,
+.crisisSupport,
+.newsUpdates {
+  max-width: 1240px;
+  margin: 44px auto;
+  padding: 0 28px;
+}
+
+.announcementHeader,
+.foundersIntro,
+.crisisIntro,
+.newsUpdatesHeader {
+  max-width: 760px;
+  margin-bottom: 22px;
+}
+
+.announcementHeader h2,
+.foundersIntro h2,
+.crisisIntro h2,
+.newsUpdatesHeader h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 44px);
+  line-height: 1.12;
+}
+
+.announcementHeader p:last-child,
+.foundersIntro p:last-child,
+.crisisIntro p:last-child,
+.newsUpdatesHeader p:last-child {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.announcementGrid,
+.newsUpdateGrid,
+.crisisGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.announcementGrid button,
+.newsUpdateGrid article,
+.crisisGrid article,
+.founderProfileCard {
+  border: 1px solid rgba(95, 143, 196, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 40px rgba(32, 86, 120, 0.1);
+}
+
+.announcementGrid button {
+  display: grid;
+  gap: 8px;
+  min-height: 150px;
+  padding: 20px;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.announcementGrid span,
+.newsUpdateGrid span,
+.crisisGrid span,
+.founderProfileCard span,
+.blogModal span {
+  color: #5f91ad;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.announcementGrid strong,
+.newsUpdateGrid h3,
+.crisisGrid a,
+.crisisGrid strong,
+.founderProfileCard h3,
+.blogModal h2 {
+  margin: 0;
+  color: var(--ink);
+}
+
+.announcementGrid p,
+.newsUpdateGrid p,
+.crisisGrid p,
+.founderProfileCard p,
+.blogModal p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.founderProfileGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.founderProfileCard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  padding: 18px;
+}
+
+.founderProfileImage {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #eef9fb;
+}
+
+.founderProfileImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.founderProfileCard > div:last-child {
+  display: grid;
+  gap: 10px;
+}
+
+.crisisSupport {
+  padding-top: 28px;
+  padding-bottom: 28px;
+  border-top: 1px solid rgba(95, 143, 196, 0.16);
+  border-bottom: 1px solid rgba(95, 143, 196, 0.16);
+}
+
+.crisisGrid article,
+.newsUpdateGrid article {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+.crisisGrid a {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 900;
+}
+
+.newsUpdateGrid button,
+.marqueeCard.clickableCard button {
+  justify-self: start;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(95, 143, 196, 0.28);
+  border-radius: 8px;
+  background: #fff;
+  color: #5f91ad;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.blogModalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483100;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(9, 20, 31, 0.68);
+}
+
+.blogModal {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: min(86vh, 760px);
+  overflow: auto;
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+}
+
+.blogModal img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.reliableFaq {
+  display: grid;
+  gap: 12px;
+}
+
+.reliableFaq article {
+  overflow: hidden;
+  border: 1px solid rgba(95, 143, 196, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.reliableFaq button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 54px;
+  padding: 16px 18px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 850;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reliableFaq article.open svg {
+  transform: rotate(180deg);
+}
+
+.reliableFaq p {
+  margin: 0;
+  padding: 0 18px 18px;
+  overflow-wrap: anywhere;
+}
+
+.footer.section {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(2, minmax(170px, 1fr)) !important;
+  gap: clamp(18px, 4vw, 42px) !important;
+  align-items: start !important;
+  width: min(1240px, calc(100% - 32px)) !important;
+  max-width: 1240px !important;
+  margin: 54px auto 0 !important;
+  padding: clamp(26px, 4vw, 42px) !important;
+  overflow: hidden !important;
+}
+
+.footer.section > div {
+  min-width: 0 !important;
+}
+
+.footer.section a,
+.footer.section button {
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+
+html[data-theme="dark"] .announcementGrid button,
+html[data-theme="dark"] .newsUpdateGrid article,
+html[data-theme="dark"] .crisisGrid article,
+html[data-theme="dark"] .founderProfileCard,
+html[data-theme="dark"] .reliableFaq article,
+html[data-theme="dark"] .blogModal {
+  background: rgba(18, 31, 38, 0.96) !important;
+  border-color: rgba(190, 222, 232, 0.18) !important;
+}
+
+html[data-theme="dark"] .announcementGrid button,
+html[data-theme="dark"] .announcementGrid strong,
+html[data-theme="dark"] .newsUpdateGrid h3,
+html[data-theme="dark"] .crisisGrid a,
+html[data-theme="dark"] .crisisGrid strong,
+html[data-theme="dark"] .founderProfileCard h3,
+html[data-theme="dark"] .blogModal h2,
+html[data-theme="dark"] .reliableFaq button {
+  color: #eef7f8 !important;
+}
+
+html[data-theme="dark"] .announcementGrid p,
+html[data-theme="dark"] .newsUpdateGrid p,
+html[data-theme="dark"] .crisisGrid p,
+html[data-theme="dark"] .founderProfileCard p,
+html[data-theme="dark"] .blogModal p,
+html[data-theme="dark"] .reliableFaq p {
+  color: #cadde2 !important;
+}
+
+@media (max-width: 980px) {
+  .announcementGrid,
+  .newsUpdateGrid,
+  .crisisGrid,
+  .founderProfileGrid,
+  .footer.section {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .founderProfileCard {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .announcementStrip,
+  .foundersSection,
+  .crisisSupport,
+  .newsUpdates {
+    padding-inline: 18px;
+  }
+
+  .announcementGrid,
+  .newsUpdateGrid,
+  .crisisGrid,
+  .founderProfileGrid,
+  .footer.section {
+    grid-template-columns: 1fr !important;
+  }
+
+  .blogModalOverlay {
+    padding: 12px;
+  }
+
+  .blogModal {
+    max-height: 88vh;
+  }
+}
+
+/* ======================================================================
+   2026-10-01: UI cleanup - founder popup, single appointment popup,
+   hidden collaboration/payment flows, and dark-mode contrast hardening.
+   ====================================================================== */
+
+.booking.bookingCta {
+  display: grid !important;
+  grid-template-columns: minmax(0, 820px) !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: clamp(34px, 6vw, 64px) 28px !important;
+}
+
+.booking.bookingCta .bookingCopy {
+  justify-items: center !important;
+}
+
+.booking.bookingCta .bookingCopy span {
+  justify-content: center;
+}
+
+.bookingCtaActions,
+.appointmentQuickContact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.appointmentModalOverlay,
+.founderModalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483200;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(7, 18, 28, 0.7);
+}
+
+.appointmentModal,
+.founderModal {
+  position: relative;
+  width: min(920px, 100%);
+  max-height: min(88vh, 820px);
+  overflow: auto;
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 3vw, 28px);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.3);
+}
+
+.appointmentModal {
+  width: min(760px, 100%);
+}
+
+.appointmentModalIntro,
+.founderModalHeader {
+  max-width: 720px;
+}
+
+.appointmentModalIntro h2,
+.founderModalHeader h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  line-height: 1.12;
+}
+
+.appointmentModalIntro p:last-child,
+.founderModalHeader p:last-child {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.appointmentModal .bookingForm {
+  box-shadow: none !important;
+}
+
+.founderKnowMore {
+  width: max-content;
+}
+
+.founderProfileGridModal {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.mainFounderCard {
+  border-color: rgba(181, 85, 111, 0.32) !important;
+}
+
+html[data-theme="dark"] .appointmentModal,
+html[data-theme="dark"] .founderModal {
+  background: #14202c !important;
+  color: #eef7f8 !important;
+  border: 1px solid rgba(190, 222, 232, 0.18);
+}
+
+html[data-theme="dark"] .appointmentModal h2,
+html[data-theme="dark"] .founderModal h2,
+html[data-theme="dark"] .appointmentModal h3,
+html[data-theme="dark"] .founderModal h3 {
+  color: #f6fbfc !important;
+}
+
+html[data-theme="dark"] .appointmentModal p,
+html[data-theme="dark"] .founderModal p {
+  color: #d7e6ea !important;
+}
+
+html[data-theme="dark"] .primaryButton,
+html[data-theme="dark"] .heroActions .primaryButton,
+html[data-theme="dark"] .bookingCtaActions .primaryButton,
+html[data-theme="dark"] .appointmentModal .primaryButton,
+html[data-theme="dark"] .surveyModal .primaryButton,
+html[data-theme="dark"] .serviceInfoModal .primaryButton,
+html[data-theme="dark"] .mobileMenuActions .primaryButton {
+  color: #10202c !important;
+  background: linear-gradient(135deg, #a9e0ff, #c5efd8) !important;
+  border-color: transparent !important;
+}
+
+html[data-theme="dark"] .outlineButton,
+html[data-theme="dark"] .heroActions .outlineButton,
+html[data-theme="dark"] .bookingCtaActions .outlineButton,
+html[data-theme="dark"] .appointmentModal .outlineButton,
+html[data-theme="dark"] .surveyModal .outlineButton,
+html[data-theme="dark"] .serviceInfoModal .outlineButton,
+html[data-theme="dark"] .founderKnowMore,
+html[data-theme="dark"] .footer.section button,
+html[data-theme="dark"] .footer.section a {
+  color: #f6fbfc !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(190, 222, 232, 0.32) !important;
+}
+
+html[data-theme="dark"] .outlineButton:hover,
+html[data-theme="dark"] .footer.section button:hover,
+html[data-theme="dark"] .footer.section a:hover {
+  color: #10202c !important;
+  background: #a9e0ff !important;
+}
+
+/* 2026-10-01 placement cleanup: top-level nav, compact footer, and non-overlapping floating help. */
+.floatingCall.whatsappHelp {
+  right: 24px !important;
+  bottom: 24px !important;
+  width: 58px !important;
+  height: 58px !important;
+  max-width: 58px !important;
+  min-height: 58px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: 50% !important;
+  z-index: 2147482400 !important;
+}
+
+.floatingCall.whatsappHelp span {
+  display: none !important;
+}
+
+.floatingCall.whatsappHelp .whatsappGlyph {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.footer.section {
+  grid-template-columns: minmax(250px, 1fr) minmax(230px, 0.9fr) minmax(230px, 0.9fr) !important;
+  gap: clamp(18px, 3vw, 32px) !important;
+  width: min(1180px, calc(100% - 48px)) !important;
+  margin-top: 42px !important;
+}
+
+.footer.section > div:first-child {
+  align-content: start !important;
+  justify-items: start !important;
+}
+
+.footer.section .logoButton {
+  justify-content: flex-start !important;
+}
+
+.footer.section h3 {
+  margin-bottom: 10px !important;
+}
+
+@media (max-width: 980px) {
+  .footer.section {
+    grid-template-columns: 1fr 1fr !important;
+    width: min(100% - 32px, 760px) !important;
+  }
+
+  .footer.section > div:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 820px) {
+  .floatingAnnouncement {
+    left: 18px !important;
+    top: auto !important;
+    bottom: 96px !important;
+  }
+
+  .floatingCrisis {
+    right: 18px !important;
+    top: auto !important;
+    bottom: 96px !important;
+  }
+
+  .homeSectionRail {
+    bottom: 12px !important;
+  }
+
+  .floatingCall.whatsappHelp {
+    right: 18px !important;
+    bottom: 214px !important;
+    width: 54px !important;
+    height: 54px !important;
+    max-width: 54px !important;
+    min-height: 54px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer.section {
+    grid-template-columns: 1fr !important;
+    width: min(100% - 28px, 520px) !important;
+    margin-top: 34px !important;
+    padding: 24px 18px !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .founderProfileGridModal {
+    grid-template-columns: 1fr !important;
+  }
+
+  .bookingCtaActions,
+  .appointmentQuickContact {
+    flex-direction: column;
+  }
+
+  .bookingCtaActions .primaryButton,
+  .bookingCtaActions .outlineButton,
+  .appointmentQuickContact .outlineButton {
+    width: 100%;
+  }
+}
+
+/* Final floating-control contract. Keep this at the end so earlier duplicated
+   rules cannot pull the controls back into overlapping positions. */
+.floatingAnnouncement {
+  left: clamp(72px, 6vw, 112px) !important;
+  top: 48vh !important;
+  bottom: auto !important;
+}
+
+.floatingCrisis {
+  right: clamp(72px, 6vw, 112px) !important;
+  top: 48vh !important;
+  bottom: auto !important;
+}
+
+.homeSectionRail {
+  left: clamp(72px, 6vw, 112px) !important;
+  top: calc(48vh + 138px) !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 2147482300 !important;
+}
+
+.homeSectionRail button {
+  min-height: 34px !important;
+  padding: 9px 15px !important;
+}
+
+.floatingCall.whatsappHelp {
+  right: 26px !important;
+  bottom: 26px !important;
+}
+
+@media (max-width: 1180px) {
+  .floatingAnnouncement {
+    left: 48px !important;
+  }
+
+  .floatingCrisis {
+    right: 48px !important;
+  }
+
+  .homeSectionRail {
+    left: 48px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .floatingAnnouncement {
+    left: 22px !important;
+    top: 42vh !important;
+  }
+
+  .floatingCrisis {
+    right: 22px !important;
+    top: 42vh !important;
+  }
+
+  .homeSectionRail {
+    left: 22px !important;
+    top: calc(42vh + 124px) !important;
+    max-width: 148px !important;
+  }
+
+  .homeSectionRail button {
+    min-height: 32px !important;
+    padding: 8px 12px !important;
+    font-size: 0.72rem !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .floatingAnnouncement {
+    left: 12px !important;
+    top: auto !important;
+    bottom: 86px !important;
+  }
+
+  .floatingCrisis {
+    right: 12px !important;
+    top: auto !important;
+    bottom: 86px !important;
+  }
+
+  .announcementOrb,
+  .crisisOrb {
+    width: 82px !important;
+    height: 82px !important;
+    padding: 11px 8px 10px !important;
+  }
+
+  .announcementOrb svg,
+  .crisisOrb svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .announcementOrb strong,
+  .crisisOrb strong {
+    max-width: 66px !important;
+    font-size: 7.4px !important;
+    line-height: 1.08 !important;
+  }
+
+  .homeSectionRail {
+    left: 10px !important;
+    right: 10px !important;
+    top: auto !important;
+    bottom: 10px !important;
+    max-width: none !important;
+    z-index: 2147482200 !important;
+  }
+
+  .floatingCall.whatsappHelp {
+    right: 12px !important;
+    bottom: 178px !important;
+    width: 50px !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    max-width: 50px !important;
+  }
+
+  .floatingCall.whatsappHelp .whatsappGlyph {
+    width: 30px !important;
+    height: 30px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .floatingAnnouncement {
+    bottom: 82px !important;
+  }
+
+  .floatingCrisis {
+    bottom: 82px !important;
+  }
+
+  .announcementDrawer,
+  .crisisDrawer {
+    bottom: 90px !important;
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 180px) !important;
+  }
+
+  .floatingCall.whatsappHelp {
+    bottom: 168px !important;
+  }
+}
+
+/* 2026-10-01 mobile speed and carousel repair. This sits last on purpose:
+   older mobile rules disabled the photo-wall animation entirely. */
+@keyframes mobileMarqueeMove {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (max-width: 900px) {
+  .marqueeViewport {
+    overflow: hidden !important;
+    mask-image: none !important;
+    contain: layout paint !important;
+  }
+
+  .marqueeTrack {
+    width: max-content !important;
+    overflow: visible !important;
+    animation: mobileMarqueeMove 48s linear infinite !important;
+    will-change: transform !important;
+    transform: translate3d(0, 0, 0) !important;
+  }
+
+  .marqueeCard {
+    width: min(238px, 72vw) !important;
+    min-height: 0 !important;
+    padding: 12px !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 24px rgba(36, 51, 69, 0.08) !important;
+    transform: none !important;
+    backface-visibility: hidden !important;
+    contain: layout paint !important;
+    scroll-snap-align: none !important;
+  }
+
+  .marqueeCard:nth-child(2n),
+  .marqueeCard:nth-child(3n) {
+    transform: none !important;
+  }
+
+  .marqueeImage {
+    height: 132px !important;
+    border-radius: 14px !important;
+  }
+
+  .marqueeCard span {
+    margin-top: 11px !important;
+    font-size: 0.72rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .marqueeCard h3 {
+    font-size: 1rem !important;
+    line-height: 1.24 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .marqueeCard.clickableCard button {
+    min-height: 34px !important;
+    padding-inline: 12px !important;
+  }
+
+  .creativeTherapyCanvas,
+  .marqueeSection,
+  .insightResourceSections,
+  .videoLearningPanel,
+  .insightVideoBoard,
+  .feedbackFaq,
+  .founderStory,
+  .booking,
+  .servicesBand,
+  .about.aboutCanvas {
+    content-visibility: auto;
+    contain-intrinsic-size: 720px;
+  }
+
+  .creativeFeature,
+  .creativeMini,
+  .insightCanvasCards article,
+  .insightResourcePanel,
+  .videoLearningPanel,
+  .workshopCard,
+  .helpCard,
+  .serviceImageTile {
+    box-shadow: 0 10px 24px rgba(36, 51, 69, 0.075) !important;
+    transform: none !important;
+  }
+
+  .creativeFeature:hover,
+  .creativeMini:hover,
+  .insightCanvasCards article:hover,
+  .marqueeCard:hover,
+  .workshopCard:hover,
+  .helpCard:hover,
+  .serviceImageTile:hover {
+    transform: none !important;
+    box-shadow: 0 10px 24px rgba(36, 51, 69, 0.075) !important;
+  }
+
+  .creativeFeature img,
+  .creativeMini img,
+  .marqueeImage img,
+  .insightCanvasCards article img {
+    transition: none !important;
+    transform: none !important;
+    image-rendering: auto;
+  }
+
+  .announcementOrb,
+  .crisisOrb {
+    animation-duration: 7s !important;
+    box-shadow:
+      inset -7px -8px 18px rgba(16, 41, 66, 0.1),
+      inset 6px 7px 14px rgba(255, 255, 255, 0.66),
+      0 10px 24px rgba(32, 86, 120, 0.16) !important;
+  }
+
+  .announcementOrb::after,
+  .crisisOrb::after {
+    animation: none !important;
+    opacity: 0.32 !important;
+  }
+
+  .announcementDrawer,
+  .crisisDrawer,
+  .appointmentModal,
+  .founderModal,
+  .blogModal,
+  .surveyModal,
+  .serviceInfoModal,
+  .helpDetailModal {
+    max-width: calc(100vw - 20px) !important;
+    overflow-wrap: anywhere !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .insightHub.section {
+    padding-inline: 16px !important;
+  }
+
+  .marqueeSection {
+    padding-inline: 0 !important;
+  }
+
+  .marqueeHeader {
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .creativeCanvasGrid {
+    gap: 14px !important;
+  }
+
+  .creativeFeature,
+  .creativeMini {
+    grid-template-rows: minmax(190px, 220px) auto !important;
+    border-radius: 18px !important;
+  }
+
+  .creativeFeature > img,
+  .creativeMini > img,
+  .creativeMini img {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .creativeFeature > div,
+  .creativeMini > div {
+    padding: 14px !important;
+  }
+
+  .creativeFeature h4,
+  .creativeMini h4 {
+    font-size: 1.02rem !important;
+    line-height: 1.24 !important;
+  }
+
+  .creativeFeature p,
+  .creativeMini p {
+    font-size: 0.9rem !important;
+    line-height: 1.48 !important;
+  }
+
+  .insightCanvasCards article {
+    padding: 0 !important;
+  }
+
+  .insightCanvasCards img {
+    height: 150px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .marqueeTrack {
+    animation-duration: 56s !important;
+  }
+
+  .marqueeCard {
+    width: min(220px, 78vw) !important;
+  }
+
+  .marqueeImage {
+    height: 120px !important;
+  }
+
+  .homeSectionRail button {
+    font-size: 0.68rem !important;
+    padding-inline: 10px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marqueeTrack,
+  .announcementOrb,
+  .crisisOrb {
+    animation: none !important;
+  }
 }

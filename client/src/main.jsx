@@ -25,7 +25,6 @@ import {
   User,
   Users,
   Download,
-  Wallet,
   Wifi,
   Wrench,
   X
@@ -33,28 +32,13 @@ import {
 import { io } from 'socket.io-client';
 import './styles.css';
 
-// Primary header nav, per the client's requested order:
-// Home, About, Services, Collaboration, Who We Help, FAQs, Contact.
-// Entries are [path, label, hash?] - a hash scrolls to that section id on
-// the target page (most of these live on the /about-us "home" page).
+// Primary header nav: top-level tabs only. Section-level movement lives in
+// the floating homepage chips, not in the global header.
 const navItems = [
   ['/about-us', 'Home'],
-  ['/about-us', 'About', 'about-us'],
-  ['/about-us', 'Services', 'services'],
-  ['/collaborations', 'Collaboration'],
-  ['/about-us', 'Who We Help', 'who'],
-  ['/about-us', 'FAQs', 'faqs'],
-  ['/about-us', 'Contact', 'contact']
-];
-
-// Full site map for the footer's "Quick Links" - keeps NeuroCogno Insight and
-// Workshops & Events reachable even though they're not in the primary nav.
-const footerNavItems = [
-  ['/about-us', 'About Us'],
-  ['/neurocogno-insight', 'NeuroCogno Insight'],
-  ['/workshops-events', 'Workshops & Events'],
-  ['/collaborations', 'Collaboration'],
-  ['/services', 'Services']
+  ['/services', 'Services'],
+  ['/neurocogno-insight', 'Insight'],
+  ['/workshops-events', 'Workshops']
 ];
 
 const siteUrl = 'https://neurocogno.com';
@@ -516,13 +500,9 @@ function scrollToSection(id) {
   track('section_jump', { section: id });
 }
 
-function goToCollaboration() {
-  navigateTo('/collaborations');
-  track('cta_click', { section: 'collaboration_page' });
-}
-
 function goToBooking() {
-  navigateTo('/about-us', { hash: 'booking' });
+  window.dispatchEvent(new CustomEvent('neurocogno:open-appointment'));
+  track('cta_click', { section: 'appointment_modal' });
 }
 
 function goHome() {
@@ -686,18 +666,6 @@ function Header({ contact, theme, onToggleTheme }) {
                 );
               })}
             </nav>
-            <div className="mobileMenuMore">
-              <span className="mobileMenuMoreLabel">More</span>
-              <nav className="mobileMenuLinks mobileMenuLinksSecondary" aria-label="More pages (mobile)">
-                {footerNavItems
-                  .filter(([path]) => path === '/neurocogno-insight' || path === '/workshops-events')
-                  .map(([path, label]) => (
-                    <button key={path} onClick={() => go(path)}>
-                      {label}
-                    </button>
-                  ))}
-              </nav>
-            </div>
             <div className="mobileMenuActions">
               <button className="primaryButton" onClick={goBookFromMenu}>
                 <CalendarDays size={18} />
@@ -1230,20 +1198,6 @@ const serviceDetails = {
       ['Session focus', 'Sessions may include counselling guidance, parent support, emotional check-ins and practical home routines.'],
       ['What to expect', 'The goal is calm, respectful care that does not feel forced or overwhelming.']
     ]
-  },
-  Collaboration: {
-    title: 'Collaboration',
-    intro: 'Collaboration opens space for schools, workplaces, communities and care groups to build mental wellness programs with NeuroCogno.',
-    cta: 'Collab With Us',
-    action: goToCollaboration,
-    sections: [
-      ['What it means', 'It can include workshops, awareness sessions, school programs, workplace wellbeing support and community mental health initiatives.'],
-      ['Who it is for', 'Schools, colleges, offices, parent groups, NGOs and community teams can partner for structured mental wellness support.'],
-      ['How it helps', 'Collaboration makes support accessible before people reach crisis. It normalises mental health conversations in familiar spaces.'],
-      ['How we do it', 'NeuroCogno understands the audience, designs the topic flow and delivers sessions that are warm, practical and respectful.'],
-      ['Program formats', 'Formats may include talks, group workshops, screening camps, parent sessions, educator sessions and awareness drives.'],
-      ['What to expect', 'The collaboration page collects enquiries so the team can plan the right format, schedule and scope.']
-    ]
   }
 };
 
@@ -1302,8 +1256,7 @@ function Services() {
     ['Parent Guidance', 'https://static.wixstatic.com/media/5f811e_c19ae8c870764a0dbf1235763d9ab876~mv2.webp/v1/fill/w_875%2Ch_556%2Cal_c%2Cq_85%2Cenc_auto/5f811e_c19ae8c870764a0dbf1235763d9ab876~mv2.webp', 'Family therapy illustration with parent and child'],
     ['Emotional Wellness', 'https://irp.cdn-website.com/450dd43d/dms3rep/multi/16692786_5767956.jpg', 'Therapist offering protective emotional support illustration'],
     ['Developmental Support', 'https://cdn.prod.website-files.com/67e1f63c84121880d6041305/69dc0fdf6c8f1d9af494fec1_Parent%20and%20Child%20Play%20Therapy%20%283%29.webp', 'Play therapy and developmental support illustration'],
-    ['Home-Based Support', '/team/booking-room.png', 'Calm counselling room for home-based mental wellness support'],
-    ['Collaboration', '/insights/creative/creative-07.jpeg', 'Art-style human collaboration and teamwork illustration']
+    ['Home-Based Support', '/team/booking-room.png', 'Calm counselling room for home-based mental wellness support']
   ];
   const steps = [
     ['Book Session', CalendarDays],
@@ -1352,7 +1305,6 @@ const traversalLinks = [
   ['/about-us', 'Start with About Us', 'Meet NeuroCogno and book an appointment'],
   ['/neurocogno-insight', 'Read NeuroCogno Insight', 'Blogs, education, videos and resources'],
   ['/workshops-events', 'View Workshops & Events', 'Upcoming programs and awareness sessions'],
-  ['/collaborations', 'Collaborate With Us', 'Partnerships for schools, workplaces and communities'],
   ['/services', 'Explore Services', 'Counselling and mental wellness support areas']
 ];
 
@@ -1374,6 +1326,37 @@ function PageLinks({ current }) {
           ))}
       </div>
     </section>
+  );
+}
+
+const homeSectionChips = [
+  ['About', 'about-us'],
+  ['Who We Help', 'who'],
+  ['Services', 'services'],
+  ['Book', 'booking'],
+  ['Crisis Support', 'crisis-support', 'popup'],
+  ['FAQs', 'faqs']
+];
+
+function HomeSectionRail() {
+  function jumpTo(id, action) {
+    if (action === 'popup' && id === 'crisis-support') {
+      window.dispatchEvent(new CustomEvent('neurocogno:open-crisis-support'));
+      track('section_jump', { section: id, mode: 'popup' });
+      return;
+    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    track('section_jump', { section: id });
+  }
+
+  return (
+    <nav className="homeSectionRail" aria-label="Homepage sections">
+      {homeSectionChips.map(([label, id, action]) => (
+        <button type="button" key={id} onClick={() => jumpTo(id, action)}>
+          {label}
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -1468,17 +1451,7 @@ function ServicesDocumentation() {
 
       <section className="serviceFaqBlock">
         <SectionTitle title="General Service Questions" />
-        <div className="faqList">
-          {serviceFaqs.map(([question, answer]) => (
-            <details key={question}>
-              <summary>
-                {question}
-                <ChevronDown size={16} />
-              </summary>
-              <p>{answer}</p>
-            </details>
-          ))}
-        </div>
+        <FaqAccordion items={serviceFaqs} />
       </section>
     </section>
   );
@@ -1504,11 +1477,344 @@ function About() {
     </section>
   );
 }
+
+const featureFlags = {
+  showExpertArticles: false,
+  showPodcasts: false
+};
+
+const announcementItems = [
+  {
+    title: 'Workshops & Events updates are now live',
+    description: 'See current planning notes and upcoming mental wellness programs.',
+    date: '2026-09-30',
+    active: true,
+    destination: '/workshops-events'
+  },
+  {
+    title: 'Crisis support resources added',
+    description: 'A dedicated support section keeps urgent helpline information easier to find.',
+    date: '2026-09-30',
+    active: true,
+    destination: '/about-us',
+    hash: 'crisis-support'
+  }
+];
+
+const workshopUpdateItems = [
+  {
+    title: 'School anxiety awareness drive',
+    description: 'Program planning space for student wellbeing and parent communication support.',
+    date: 'July 2026',
+    active: true,
+    destination: '/workshops-events',
+    hash: 'news-updates'
+  },
+  {
+    title: 'Corporate stress management workshop',
+    description: 'Workplace session updates can be published here as details are finalized.',
+    date: 'August 2026',
+    active: true,
+    destination: '/workshops-events',
+    hash: 'news-updates'
+  },
+  {
+    title: 'Parent-child communication session',
+    description: 'Guidance-led event placeholder ready for final date, venue and registration link.',
+    date: 'September 2026',
+    active: true,
+    destination: '/workshops-events',
+    hash: 'news-updates'
+  }
+];
+
+const founderProfiles = [
+  {
+    name: 'Founder Name',
+    designation: 'Founder, NeuroCogno',
+    image: '/team/founder-photo.png',
+    alt: 'NeuroCogno founder',
+    bio:
+      'Editable founder biography placeholder. Add the final name, role and profile copy here when approved.'
+  },
+  {
+    name: 'Co-Founder Name',
+    designation: 'Co-Founder, NeuroCogno',
+    image: '/team/cofounder-photo.png',
+    alt: 'NeuroCogno co-founder',
+    bio:
+      'Editable co-founder biography placeholder. Replace this copy and image source with the supplied final co-founder details.'
+  },
+  {
+    name: 'Team Member Name',
+    designation: 'NeuroCogno Team',
+    image: '/team/team-member-photo.png',
+    alt: 'NeuroCogno team member',
+    bio:
+      'Editable team profile placeholder. Add the final approved name, designation and biography for this supplied profile photo.'
+  }
+];
+
+const crisisSupportEntries = [
+  {
+    label: 'Emergency services',
+    phone: '112',
+    note: 'For immediate physical danger or life-threatening emergencies.'
+  },
+  {
+    label: 'Tele MANAS',
+    phone: '14416',
+    note: '24/7 free mental health helpline in India.'
+  },
+  {
+    label: 'NeuroCogno direct support',
+    phone: '',
+    note: 'Use the contact number configured for the website team.'
+  }
+];
+
+function openDestination(item) {
+  if (item.hash === 'crisis-support') {
+    window.dispatchEvent(new CustomEvent('neurocogno:open-crisis-support'));
+    return;
+  }
+  navigateTo(item.destination || '/about-us', item.hash ? { hash: item.hash } : undefined);
+}
+
+function AnnouncementPanel({ items = announcementItems }) {
+  const activeItems = items.filter((item) => item.active !== false).slice(0, 3);
+  const [open, setOpen] = useState(false);
+  if (!activeItems.length) return null;
+
+  return (
+    <aside className={`floatingAnnouncement ${open ? 'open' : ''}`} aria-label="Recent announcements">
+      <button
+        type="button"
+        className="announcementOrb"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-label={open ? 'Close announcements' : 'Open announcements'}
+      >
+        <span className="announcementOrbGlow" aria-hidden="true" />
+        <Sparkles size={22} />
+        <strong>Announcement</strong>
+      </button>
+      {open && (
+        <div className="announcementDrawer" role="dialog" aria-modal="false" aria-label="Latest NeuroCogno announcements">
+          <div className="announcementDrawerHeader">
+            <p className="eyebrow">Latest updates</p>
+            <h2>Announcements</h2>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Close announcements">
+              <X size={18} />
+            </button>
+          </div>
+          <p className="announcementLead">
+            Recent notices, support updates, and quick routes to the relevant NeuroCogno section.
+          </p>
+          <div className="announcementDrawerList">
+            {activeItems.map((item, index) => (
+              <button
+                type="button"
+                key={item.title}
+                onClick={() => {
+                  setOpen(false);
+                  openDestination(item);
+                }}
+              >
+                <span>{item.date}</span>
+                <strong>{item.title}</strong>
+                <p>{item.description}</p>
+                <small>{index === 0 ? 'New' : 'Update'}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+function NewsUpdates({ items = workshopUpdateItems, title = 'News & Updates', id = 'news-updates' }) {
+  const activeItems = items.filter((item) => item.active !== false);
+  if (!activeItems.length) return null;
+
+  return (
+    <section className="newsUpdates section" id={id}>
+      <div className="newsUpdatesHeader">
+        <p className="eyebrow">Fresh notes</p>
+        <h2>{title}</h2>
+      </div>
+      <div className="newsUpdateGrid">
+        {activeItems.map((item) => (
+          <article key={item.title}>
+            <span>{item.date}</span>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+            {(item.destination || item.hash) && (
+              <button type="button" onClick={() => openDestination(item)}>
+                Open Update
+              </button>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FoundersSection({ compact = false }) {
+  return (
+    <section className={`foundersSection section ${compact ? 'foundersSectionCompact' : ''}`} id="founders">
+      <div className="foundersIntro">
+        <p className="eyebrow">People behind NeuroCogno</p>
+        <h2>Founders</h2>
+        <p>Profile names, designations and biographies are kept in editable data so the final approved details can be entered cleanly.</p>
+      </div>
+      <div className="founderProfileGrid">
+        {founderProfiles.map((profile) => (
+          <article key={profile.designation} className="founderProfileCard">
+            <div className="founderProfileImage">
+              <img src={profile.image} alt={profile.alt || profile.name} />
+            </div>
+            <div>
+              <span>{profile.designation}</span>
+              <h3>{profile.name}</h3>
+              <p>{profile.bio}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FoundersPage({ theme, onToggleTheme }) {
+  useSeo('home');
+  useSectionTracking('founders');
+  const config = usePublicConfig('founders');
+
+  return (
+    <SiteLayout config={config} theme={theme} onToggleTheme={onToggleTheme}>
+      <FoundersSection />
+    </SiteLayout>
+  );
+}
+
+function CrisisSupportPanel({ contact }) {
+  const [open, setOpen] = useState(false);
+  const entries = crisisSupportEntries.map((entry) =>
+    entry.label === 'NeuroCogno direct support' ? { ...entry, phone: contact.ceoPhone } : entry
+  );
+
+  useEffect(() => {
+    const openCrisisSupport = () => setOpen(true);
+    window.addEventListener('neurocogno:open-crisis-support', openCrisisSupport);
+    return () => window.removeEventListener('neurocogno:open-crisis-support', openCrisisSupport);
+  }, []);
+
+  return (
+    <aside className={`floatingCrisis ${open ? 'open' : ''}`} id="crisis-support" aria-label="Suicide and crisis support">
+      <button
+        type="button"
+        className="crisisOrb"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-label={open ? 'Close crisis support' : 'Open crisis support'}
+      >
+        <span className="crisisOrbGlow" aria-hidden="true" />
+        <HeartPulse size={22} />
+        <strong>Crisis Support</strong>
+      </button>
+      {open && (
+        <div className="crisisDrawer" role="dialog" aria-modal="false" aria-label="Suicide and crisis support information">
+          <div className="crisisDrawerHeader">
+            <p className="eyebrow">Suicide & crisis support</p>
+            <h2>Immediate support</h2>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Close crisis support">
+              <X size={18} />
+            </button>
+          </div>
+          <p className="crisisLead">
+            If there is immediate danger, contact emergency services first. These resources are shown so help is easy to reach.
+          </p>
+          <div className="crisisDrawerList">
+            {entries.map((entry) => {
+              const number = String(entry.phone || '').trim();
+              const canCall = /^\+?[\d\s()-]+$/.test(number);
+              return (
+                <article key={entry.label}>
+                  <span>{entry.label}</span>
+                  {canCall ? <a href={`tel:${number.replace(/[^\d+]/g, '')}`}>{number}</a> : <strong>{number}</strong>}
+                  <p>{entry.note}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+function FaqAccordion({ items }) {
+  const [openQuestion, setOpenQuestion] = useState(items[0]?.[0] || '');
+
+  return (
+    <div className="faqList reliableFaq">
+      {items.map(([question, answer]) => {
+        const isOpen = openQuestion === question;
+        return (
+          <article key={question} className={isOpen ? 'open' : ''}>
+            <button type="button" aria-expanded={isOpen} onClick={() => setOpenQuestion(isOpen ? '' : question)}>
+              {question}
+              <ChevronDown size={16} />
+            </button>
+            {isOpen && <p>{answer}</p>}
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+function FounderProfilesModal({ onClose }) {
+  return createPortal(
+    <div className="founderModalOverlay" role="dialog" aria-modal="true" aria-label="NeuroCogno founders and partners">
+      <article className="founderModal">
+        <button className="closeButton" type="button" onClick={onClose} aria-label="Close founder details">
+          ×
+        </button>
+        <div className="founderModalHeader">
+          <p className="eyebrow">Founder & co-partners</p>
+          <h2>People behind NeuroCogno</h2>
+          <p>Final names, designations and biographies can be updated here when you share the approved content.</p>
+        </div>
+        <div className="founderProfileGrid founderProfileGridModal">
+          {founderProfiles.map((profile, index) => (
+            <article key={profile.image} className={`founderProfileCard ${index === 0 ? 'mainFounderCard' : ''}`}>
+              <div className="founderProfileImage">
+                <img src={profile.image} alt={profile.alt || profile.name} />
+              </div>
+              <div>
+                <span>{index === 0 ? 'Main CEO' : profile.designation}</span>
+                <h3>{profile.name}</h3>
+                <p>{profile.bio}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </article>
+    </div>,
+    document.body
+  );
+}
+
 function FounderStory() {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
   return (
     <section className="founderStory section" aria-label="NeuroCogno founder story">
       <div className="founderPortrait">
-        <img src="/team/ceo-booking.jpeg" alt="NeuroCogno CEO and founder" className="objectFitFace" />
+        <img src="/team/founder-photo.png" alt="NeuroCogno main CEO" className="objectFitFace" />
       </div>
       <div className="founderCopy">
         <p className="eyebrow">Founder’s note</p>
@@ -1519,28 +1825,37 @@ function FounderStory() {
           that families can trust. What started as a focused vision for compassionate mental wellness has grown into a space where
           children, adults and communities can feel heard, guided and respected.
         </p>
+        <button className="outlineButton founderKnowMore" type="button" onClick={() => setDetailsOpen(true)}>
+          Know More
+        </button>
       </div>
+      {detailsOpen && <FounderProfilesModal onClose={() => setDetailsOpen(false)} />}
     </section>
   );
 }
 
-function AppointmentForm({ config, onLeadReady }) {
-  const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    age: '',
-    ageGroup: '',
-    reason: '',
-    message: '',
-    consentToContact: false
-  });
+const initialLeadForm = {
+  name: '',
+  organization: '',
+  phone: '',
+  email: '',
+  age: '',
+  ageGroup: '',
+  reason: '',
+  collaborationType: '',
+  message: '',
+  consentToContact: false
+};
+
+function PublicLeadForm({ mode = 'appointment', config, onLeadReady }) {
+  const [form, setForm] = useState(initialLeadForm);
   const [status, setStatus] = useState('');
   const draftTimer = useRef(null);
+  const isCollaboration = mode === 'collaboration';
 
   useEffect(() => {
     clearTimeout(draftTimer.current);
-    if (!form.name.trim() || (!form.phone.trim() && !form.email.trim())) return;
+    if (isCollaboration || !form.name.trim() || (!form.phone.trim() && !form.email.trim())) return;
 
     draftTimer.current = setTimeout(() => {
       api.post('/api/public/lead-drafts', {
@@ -1557,24 +1872,47 @@ function AppointmentForm({ config, onLeadReady }) {
     }, 900);
 
     return () => clearTimeout(draftTimer.current);
-  }, [form]);
+  }, [form, isCollaboration]);
 
   const update = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
-    if (['name', 'phone', 'email'].includes(field)) track('form_focus', { section: 'booking' });
+    if (['name', 'phone', 'email'].includes(field)) track('form_focus', { section: mode });
   };
 
   async function submit(event) {
     event.preventDefault();
-    setStatus('Saving appointment request...');
+    setStatus(isCollaboration ? 'Sending collaboration enquiry...' : 'Saving appointment request...');
     try {
+      if (isCollaboration) {
+        await api.post('/api/public/collaboration-inquiries', {
+          visitorId: visitorId(),
+          name: form.name,
+          organization: form.organization,
+          phone: form.phone,
+          email: form.email,
+          collaborationType: form.collaborationType,
+          message: form.message,
+          consentToContact: form.consentToContact
+        });
+        setStatus('Collaboration enquiry saved. Our team will contact you.');
+        setForm(initialLeadForm);
+        return;
+      }
+
       const data = await api.post('/api/public/appointments', {
-        ...form,
         visitorId: visitorId(),
-        source: 'appointment_form'
+        source: 'appointment_form',
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        age: form.age,
+        ageGroup: form.ageGroup,
+        reason: form.reason,
+        message: form.message,
+        consentToContact: form.consentToContact
       });
       setStatus('Appointment request saved. You can now secure the booking slot.');
-      onLeadReady(data.leadId, data.payment || config.payment);
+      onLeadReady?.(data.leadId, data.payment || config?.payment);
     } catch (error) {
       setStatus(error.message);
     }
@@ -1584,43 +1922,41 @@ function AppointmentForm({ config, onLeadReady }) {
     <form className="bookingForm" onSubmit={submit}>
       <div className="fieldPair">
         <input required placeholder="Full Name" value={form.name} onChange={(e) => update('name', e.target.value)} />
-        <input
-          required
-          placeholder="Phone Number"
-          value={form.phone}
-          onChange={(e) => update('phone', e.target.value)}
-        />
+        {isCollaboration ? (
+          <input placeholder="Organization / Institution" value={form.organization} onChange={(e) => update('organization', e.target.value)} />
+        ) : (
+          <input required placeholder="Phone Number" value={form.phone} onChange={(e) => update('phone', e.target.value)} />
+        )}
       </div>
       <div className="fieldPair">
+        {isCollaboration && <input required placeholder="Phone Number" value={form.phone} onChange={(e) => update('phone', e.target.value)} />}
         <input placeholder="Email Address" value={form.email} onChange={(e) => update('email', e.target.value)} />
-        <input
-          type="number"
-          min="0"
-          max="120"
-          inputMode="numeric"
-          placeholder="Age"
-          value={form.age}
-          onChange={(e) => update('age', e.target.value)}
-        />
       </div>
-      <div className="fieldPair">
-        <select value={form.ageGroup} onChange={(e) => update('ageGroup', e.target.value)}>
-          <option value="">Age Group</option>
-          <option>Child</option>
-          <option>Teenager</option>
-          <option>Adult</option>
-          <option>Senior</option>
-        </select>
-        <select value={form.reason} onChange={(e) => update('reason', e.target.value)}>
-          <option value="">Reason for Consultation</option>
-          <option>Anxiety or stress</option>
-          <option>Relationship concern</option>
-          <option>Parent guidance</option>
-          <option>Academic pressure</option>
-          <option>Emotional wellbeing</option>
-          <option>Others</option>
-        </select>
-      </div>
+      {isCollaboration ? (
+        <input required placeholder="Collaboration Type" value={form.collaborationType} onChange={(e) => update('collaborationType', e.target.value)} />
+      ) : (
+        <>
+          <div className="fieldPair">
+            <input type="number" min="0" max="120" inputMode="numeric" placeholder="Age" value={form.age} onChange={(e) => update('age', e.target.value)} />
+            <select value={form.ageGroup} onChange={(e) => update('ageGroup', e.target.value)}>
+              <option value="">Age Group</option>
+              <option>Child</option>
+              <option>Teenager</option>
+              <option>Adult</option>
+              <option>Senior</option>
+            </select>
+          </div>
+          <select value={form.reason} onChange={(e) => update('reason', e.target.value)}>
+            <option value="">Reason for Consultation</option>
+            <option>Anxiety or stress</option>
+            <option>Relationship concern</option>
+            <option>Parent guidance</option>
+            <option>Academic pressure</option>
+            <option>Emotional wellbeing</option>
+            <option>Others</option>
+          </select>
+        </>
+      )}
       <textarea placeholder="Your Message" value={form.message} onChange={(e) => update('message', e.target.value)} />
       <label className="consent">
         <input
@@ -1633,11 +1969,56 @@ function AppointmentForm({ config, onLeadReady }) {
       </label>
       <p className="privacyNote">Details typed here may be saved so the care team can follow up if you leave midway.</p>
       <button className="primaryButton fullWidth" type="submit">
-        Request Appointment
+        {isCollaboration ? 'Send Collaboration Enquiry' : 'Request Appointment'}
         <Send size={17} />
       </button>
       {status && <p className="formStatus">{status}</p>}
     </form>
+  );
+}
+
+function AppointmentForm({ config, onLeadReady }) {
+  return <PublicLeadForm mode="appointment" config={config} onLeadReady={onLeadReady} />;
+}
+
+function AppointmentModal({ config, onLeadReady, onClose }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  return createPortal(
+    <div className="appointmentModalOverlay" role="dialog" aria-modal="true" aria-label="Book an appointment">
+      <article className="appointmentModal">
+        <button className="closeButton" type="button" onClick={onClose} aria-label="Close appointment form">
+          ×
+        </button>
+        <div className="appointmentModalIntro">
+          <p className="eyebrow">Book appointment</p>
+          <h2>Share your details and the NeuroCogno team will follow up.</h2>
+          <p>The same appointment form is used across the website, so every booking request reaches the admin backend consistently.</p>
+        </div>
+        <AppointmentForm
+          config={config}
+          onLeadReady={(leadId, payment) => {
+            onLeadReady?.(leadId, payment);
+          }}
+        />
+        <div className="appointmentQuickContact">
+          <a className="outlineButton" href={`tel:${config.contact.ceoPhone}`}>
+            <Phone size={17} />
+            Call to Book
+          </a>
+          <a className="outlineButton" href="/api/public/whatsapp-help" target="_blank" rel="noopener noreferrer">
+            <Phone size={17} />
+            WhatsApp Team
+          </a>
+        </div>
+      </article>
+    </div>,
+    document.body
   );
 }
 
@@ -1722,18 +2103,15 @@ function AppointmentSelfCheck({ onClose }) {
   );
 }
 
-function Booking({ config, onLeadReady }) {
+function Booking({ config }) {
   const [selfCheckOpen, setSelfCheckOpen] = useState(false);
 
   return (
     <>
-      <section className="booking section" id="booking">
-        <div className="bookingPortrait" aria-label="Calm counselling room visual">
-          <img src="/team/booking-room.png" alt="Calm counselling room at NeuroCogno" />
-        </div>
+      <section className="booking bookingCta section" id="booking">
         <div className="bookingCopy">
           <h2>Book an Appointment</h2>
-          <p>Take the first step towards a better tomorrow.</p>
+          <p>Take the first step with one clear request form. The team can call, WhatsApp, or guide you toward the right next step.</p>
           {['100% Confidential', 'Safe & Supportive Environment', 'Professional Guidance', 'Flexible Scheduling'].map(
             (item) => (
               <span key={item}>
@@ -1749,8 +2127,21 @@ function Booking({ config, onLeadReady }) {
               Take a Gentle Self-Check
             </button>
           </div>
+          <div className="bookingCtaActions">
+            <button className="primaryButton" type="button" onClick={goToBooking}>
+              <CalendarDays size={18} />
+              Book Appointment
+            </button>
+            <a className="outlineButton" href={`tel:${config.contact.ceoPhone}`}>
+              <Phone size={18} />
+              Call the Team
+            </a>
+            <a className="outlineButton" href="/api/public/whatsapp-help" target="_blank" rel="noopener noreferrer">
+              <Phone size={18} />
+              WhatsApp
+            </a>
+          </div>
         </div>
-        <AppointmentForm config={config} onLeadReady={onLeadReady} />
       </section>
       {selfCheckOpen && <AppointmentSelfCheck onClose={() => setSelfCheckOpen(false)} />}
     </>
@@ -1798,6 +2189,16 @@ const blogItems = [
 
 function MovingCardStrip({ title, kicker, items, id }) {
   const loopItems = [...items, ...items];
+  const [selectedBlog, setSelectedBlog] = useState(null);
+  const isBlogStrip = id === 'insight-media';
+
+  useEffect(() => {
+    if (!selectedBlog) return undefined;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [selectedBlog]);
 
   return (
     <section className="marqueeSection section" id={id}>
@@ -1808,16 +2209,42 @@ function MovingCardStrip({ title, kicker, items, id }) {
       <div className="marqueeViewport">
         <div className="marqueeTrack">
           {loopItems.map((item, index) => (
-            <article className="marqueeCard" key={`${item.title}-${index}`}>
+            <article className={`marqueeCard ${isBlogStrip ? 'clickableCard' : ''}`} key={`${item.title}-${index}`}>
               <div className="marqueeImage">
-                <img src={item.image} alt={item.alt || item.title || 'NeuroCogno media'} onError={(event) => event.currentTarget.classList.add('missingMedia')} />
+                <img
+                  src={item.image}
+                  alt={item.alt || item.title || 'NeuroCogno media'}
+                  loading={index > 1 ? 'lazy' : 'eager'}
+                  decoding="async"
+                  onError={(event) => event.currentTarget.classList.add('missingMedia')}
+                />
               </div>
               <span>{item.tag}</span>
               <h3>{item.title}</h3>
+              {isBlogStrip && (
+                <button type="button" onClick={() => setSelectedBlog(item)}>
+                  Read
+                </button>
+              )}
             </article>
           ))}
         </div>
       </div>
+      {selectedBlog &&
+        createPortal(
+          <div className="blogModalOverlay" role="dialog" aria-modal="true" aria-label={selectedBlog.title}>
+            <article className="blogModal">
+              <button className="closeButton" type="button" onClick={() => setSelectedBlog(null)} aria-label="Close blog">
+                ×
+              </button>
+              <img src={selectedBlog.image} alt={selectedBlog.alt || selectedBlog.title || 'NeuroCogno blog visual'} loading="lazy" decoding="async" />
+              <span>{selectedBlog.tag}</span>
+              <h2>{selectedBlog.title}</h2>
+              <p>{selectedBlog.copy || selectedBlog.description || 'Detailed NeuroCogno blog content can be added here when the full article is ready.'}</p>
+            </article>
+          </div>,
+          document.body
+        )}
     </section>
   );
 }
@@ -1826,7 +2253,6 @@ const insightResources = [
   { title: 'Blogs', id: 'insight-blogs', copy: 'Expert-backed articles on emotional wellness, child development, stress, relationships and parent guidance.' },
   { title: 'Podcasts', id: 'insight-podcasts', copy: 'Space for NeuroCogno audio conversations, expert interviews and educational series.' },
   { title: 'Expert Articles', id: 'insight-expert-articles', copy: 'Long-form explainers, clinical reflections and practical mental wellness resources.' },
-  { title: 'News & Updates', id: 'insight-news', copy: 'Announcements, public programs, launches and team updates.' },
   { title: 'Resources', id: 'insight-resources', copy: 'Downloadable guides, checklists and worksheets can be added here later.' },
   { title: 'Photo Stories', id: 'insight-media', copy: 'Polaroid-style snapshots from awareness programs, shoots and community initiatives.' }
 ];
@@ -1836,9 +2262,15 @@ function InsightFloatingRail() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  const visibleResources = insightResources.filter((item) => {
+    if (item.id === 'insight-podcasts') return featureFlags.showPodcasts;
+    if (item.id === 'insight-expert-articles') return featureFlags.showExpertArticles;
+    return true;
+  });
+
   return (
     <nav className="insightFloatingRail" aria-label="NeuroCogno Insight sections">
-      {insightResources.map((item) => (
+      {visibleResources.map((item) => (
         <button type="button" key={item.id} onClick={() => jumpTo(item.id)}>
           <span>{item.title}</span>
         </button>
@@ -1878,22 +2310,6 @@ const insightSectionFallbacks = {
       title: 'How children build problem-solving confidence',
       copy: 'A space for deeper explainers, professional reflections and evidence-informed wellbeing resources.',
       alt: 'Construction play activity for applied psychology article'
-    }
-  ],
-  'insight-news': [
-    {
-      image: '/team/booking-room.png',
-      tag: 'Team Update',
-      title: 'Announcements, programs and public updates',
-      copy: 'Use this canvas for launches, awareness drives, community programs, collaboration notices and NeuroCogno updates.',
-      alt: 'Calm NeuroCogno room for news update canvas'
-    },
-    {
-      image: '/insights/creative/creative-04.jpeg',
-      tag: 'Awareness Moment',
-      title: 'Seasonal activities and wellbeing messages',
-      copy: 'A visual place for timely updates that should feel warm, useful and easy for families to scan.',
-      alt: 'Child seasonal artwork for awareness update'
     }
   ],
   'insight-resources': [
@@ -1943,13 +2359,16 @@ function InsightResourceSections({ content = [] }) {
   const placements = {
     'insight-blogs': 'insights.blogs',
     'insight-expert-articles': 'insights.expert',
-    'insight-news': 'insights.news',
     'insight-resources': 'insights.resources'
   };
 
   return (
     <div className="insightResourceSections" aria-label="Insight written resources">
-      {insightResources.filter((item) => !['insight-media', 'insight-podcasts'].includes(item.id)).map((item) => (
+      {insightResources.filter((item) => {
+        if (['insight-media', 'insight-podcasts'].includes(item.id)) return false;
+        if (item.id === 'insight-expert-articles') return featureFlags.showExpertArticles;
+        return true;
+      }).map((item) => (
         <InsightSectionCanvas
           key={item.id}
           resource={item}
@@ -2084,7 +2503,7 @@ function CreativeTherapyCanvas({ items = [] }) {
       <div className="creativeCanvasGrid">
         {lead && (
           <article className="creativeFeature">
-            <img src={lead.image} alt={lead.alt || lead.title || 'NeuroCogno creative therapy highlight'} />
+            <img src={lead.image} alt={lead.alt || lead.title || 'NeuroCogno creative therapy highlight'} loading="lazy" decoding="async" />
             <div>
               <span>{lead.tag}</span>
               <h4>{lead.title}</h4>
@@ -2095,7 +2514,7 @@ function CreativeTherapyCanvas({ items = [] }) {
         <div className="creativeMiniGrid">
           {rest.map((item, index) => (
             <article key={`${item.title}-${index}`} className={`creativeMini miniTone${index + 1}`}>
-              <img src={item.image} alt={item.alt || item.title || 'NeuroCogno creative work'} />
+              <img src={item.image} alt={item.alt || item.title || 'NeuroCogno creative work'} loading="lazy" decoding="async" />
               <div>
                 <span>{item.tag}</span>
                 <h4>{item.title}</h4>
@@ -2139,7 +2558,13 @@ function InsightHub({ content = [] }) {
           {canvasItems.map((item, index) => (
             <article className={`insightCanvas canvasTone${index + 1}`} key={`${item.title}-${index}`}>
               <div className="insightCanvasImage">
-                <img src={item.image} alt={item.alt || item.title || 'NeuroCogno visual story'} onError={(event) => event.currentTarget.classList.add('missingMedia')} />
+                <img
+                  src={item.image}
+                  alt={item.alt || item.title || 'NeuroCogno visual story'}
+                  loading="lazy"
+                  decoding="async"
+                  onError={(event) => event.currentTarget.classList.add('missingMedia')}
+                />
               </div>
               <div>
                 <span>{item.tag}</span>
@@ -2151,25 +2576,27 @@ function InsightHub({ content = [] }) {
         </div>
       )}
       <InsightResourceSections content={content} />
-      <div className="videoLearningPanel" id="insight-podcasts">
-        <div>
-          <p className="eyebrow">Video learning space</p>
-          <h3>YouTube education video embed</h3>
-          <p>Paste an approved YouTube watch, shorts, embed, playlist, or iframe link in CMS and it can play directly here.</p>
+      {featureFlags.showPodcasts && (
+        <div className="videoLearningPanel" id="insight-podcasts">
+          <div>
+            <p className="eyebrow">Video learning space</p>
+            <h3>YouTube education video embed</h3>
+            <p>Paste an approved YouTube watch, shorts, embed, playlist, or iframe link in CMS and it can play directly here.</p>
+          </div>
+          <div className={`videoFrame ${videoUrl ? 'hasVideo' : ''}`} aria-label="YouTube video space">
+            {videoUrl ? (
+              <iframe src={videoUrl} title="NeuroCogno education video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+            ) : (
+              <>
+                <Monitor size={42} />
+                <strong>Video Embed Space</strong>
+                <span>Ready for YouTube, podcast clips, or educational media.</span>
+              </>
+            )}
+          </div>
         </div>
-        <div className={`videoFrame ${videoUrl ? 'hasVideo' : ''}`} aria-label="YouTube video space">
-          {videoUrl ? (
-            <iframe src={videoUrl} title="NeuroCogno education video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
-          ) : (
-            <>
-              <Monitor size={42} />
-              <strong>Video Embed Space</strong>
-              <span>Ready for YouTube, podcast clips, or educational media.</span>
-            </>
-          )}
-        </div>
-      </div>
-      {videoItems.length > 1 && (
+      )}
+      {featureFlags.showPodcasts && videoItems.length > 1 && (
         <div className="insightVideoBoard" aria-label="Additional NeuroCogno videos">
           {videoItems.slice(1, 4).map((item) => (
             <article key={item.embed}>
@@ -2207,6 +2634,7 @@ function WorkshopsEvents({ content = [] }) {
           </article>
         ))}
       </div>
+      <NewsUpdates />
     </section>
   );
 }
@@ -2237,17 +2665,7 @@ function TestimonialsFaq({ contact }) {
       </div>
       <div>
         <SectionTitle title="Frequently Asked Questions" />
-        <div className="faqList">
-          {faqs.map(([q, a]) => (
-            <details key={q}>
-              <summary>
-                {q}
-                <ChevronDown size={16} />
-              </summary>
-              <p>{a}</p>
-            </details>
-          ))}
-        </div>
+        <FaqAccordion items={faqs} />
       </div>
       <a
         className="floatingCall whatsappHelp"
@@ -2275,14 +2693,6 @@ function Footer({ contact }) {
         <p>Empowering minds. Enriching lives.</p>
       </div>
       <div>
-        <h3>Quick Links</h3>
-        {footerNavItems.map(([path, label]) => (
-          <button key={path} onClick={() => navigateTo(path)}>
-            {label}
-          </button>
-        ))}
-      </div>
-      <div>
         <h3>Contact Us</h3>
         <a href={`tel:${contact.ceoPhone}`}>
           <Phone size={16} /> {contact.ceoPhone}
@@ -2299,9 +2709,12 @@ function Footer({ contact }) {
         <a href={`tel:${contact.ceoPhone}`}>
           <Phone size={18} /> Connect with Team
         </a>
-        <button onClick={goToCollaboration}>
-          <Users size={18} /> Collab With Us
+        <button onClick={goToBooking}>
+          <CalendarDays size={18} /> Book Appointment
         </button>
+        <a href="/api/public/whatsapp-help" target="_blank" rel="noopener noreferrer">
+          <Phone size={18} /> WhatsApp Team
+        </a>
       </div>
     </footer>
   );
@@ -2511,66 +2924,7 @@ const surveyQuestions = [
 }
 
 function PaymentPanel({ pendingLead, config }) {
-  const [status, setStatus] = useState('');
-
-  if (!pendingLead) return null;
-
-  async function loadRazorpay() {
-    if (window.Razorpay) return true;
-    return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  }
-
-  async function pay() {
-    setStatus('Preparing secure checkout...');
-    try {
-      const order = await api.post('/api/payments/orders', { leadId: pendingLead, source: 'appointment_form' });
-      const loaded = await loadRazorpay();
-      if (!loaded) throw new Error('Could not load payment checkout.');
-
-      track('payment_opened', { metadata: { leadId: pendingLead } });
-
-      const checkout = new window.Razorpay({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'NeuroCogno',
-        description: 'Booking slot payment',
-        order_id: order.orderId,
-        handler: async (response) => {
-          await api.post('/api/payments/verify', { ...response, leadId: pendingLead });
-          setStatus('Payment verified. Your booking slot is secured.');
-        },
-        theme: { color: '#5f8fc4' },
-        modal: {
-          ondismiss: () => setStatus('Checkout closed before payment was completed.')
-        }
-      });
-      checkout.open();
-    } catch (error) {
-      setStatus(error.message);
-    }
-  }
-
-  return (
-    <div className="paymentPanel">
-      <div>
-        <Wallet size={22} />
-        <strong>Booking slot payment</strong>
-        <span>Amount: ₹{config.payment.amountInr}</span>
-      </div>
-      <button className="primaryButton" onClick={pay}>
-        Pay Securely
-      </button>
-      {!config.payment.configured && <p>Gateway keys are not configured yet. This is visible in admin issues.</p>}
-      {status && <p>{status}</p>}
-    </div>
-  );
+  return null;
 }
 
 function PublicSite({ theme, onToggleTheme }) {
@@ -2663,46 +3017,10 @@ function CollaborationPage({ theme, onToggleTheme }) {
       address: 'Bangalore, India'
     }
   });
-  const [form, setForm] = useState({
-    name: '',
-    organization: '',
-    phone: '',
-    email: '',
-    collaborationType: '',
-    message: '',
-    consentToContact: false
-  });
-  const [status, setStatus] = useState('');
-
   useEffect(() => {
     api.get('/api/public/config').then(setConfig).catch(() => {});
     track('page_view', { section: 'collaborations' });
   }, []);
-
-  const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
-
-  async function submit(event) {
-    event.preventDefault();
-    setStatus('Sending collaboration enquiry...');
-    try {
-      await api.post('/api/public/collaboration-inquiries', {
-        ...form,
-        visitorId: visitorId()
-      });
-      setStatus('Collaboration enquiry saved. Our team will contact you.');
-      setForm({
-        name: '',
-        organization: '',
-        phone: '',
-        email: '',
-        collaborationType: '',
-        message: '',
-        consentToContact: false
-      });
-    } catch (error) {
-      setStatus(error.message);
-    }
-  }
 
   return (
     <>
@@ -2767,35 +3085,9 @@ function CollaborationPage({ theme, onToggleTheme }) {
               {config.contact.emails?.[0] || config.contact.email}
             </a>
           </div>
-          <form className="bookingForm" onSubmit={submit}>
-            <div className="fieldPair">
-              <input required placeholder="Full Name" value={form.name} onChange={(event) => update('name', event.target.value)} />
-              <input placeholder="Organization / Institution" value={form.organization} onChange={(event) => update('organization', event.target.value)} />
-            </div>
-            <div className="fieldPair">
-              <input required placeholder="Phone Number" value={form.phone} onChange={(event) => update('phone', event.target.value)} />
-              <input placeholder="Email Address" value={form.email} onChange={(event) => update('email', event.target.value)} />
-            </div>
-            <input required placeholder="Collaboration Type" value={form.collaborationType} onChange={(event) => update('collaborationType', event.target.value)} />
-            <textarea placeholder="Tell us about the collaboration idea" value={form.message} onChange={(event) => update('message', event.target.value)} />
-            <label className="consent">
-              <input
-                required
-                type="checkbox"
-                checked={form.consentToContact}
-                onChange={(event) => update('consentToContact', event.target.checked)}
-              />
-              I consent to NeuroCogno saving these details and contacting me about collaboration.
-            </label>
-            <button className="primaryButton fullWidth" type="submit">
-              Send Enquiry
-              <Send size={17} />
-            </button>
-            {status && <p className="formStatus">{status}</p>}
-          </form>
+          <PublicLeadForm mode="collaboration" config={config} />
         </section>
       </main>
-      <PageLinks current={window.location.pathname === '/' ? '/about-us' : window.location.pathname} />
       <Footer contact={config.contact} />
     </>
   );
@@ -3352,22 +3644,6 @@ const contentPresets = [
     }
   },
   {
-    name: 'Insight news update canvas card',
-    helper: 'Image card shown in the News & Updates section. Order controls card position only inside News & Updates.',
-    values: {
-      key: 'insights.news.',
-      section: 'insights',
-      type: 'image',
-      label: 'Insight news update canvas card',
-      placement: 'insights.news',
-      subtitle: 'News Update',
-      title: 'New NeuroCogno update',
-      description: 'Short update summary shown on this card.',
-      order: 0,
-      isActive: true
-    }
-  },
-  {
     name: 'Insight resource canvas card',
     helper: 'Image card shown in the Resources section. Order controls card position only inside Resources.',
     values: {
@@ -3515,12 +3791,6 @@ const contentFieldSchemas = {
     fields: ['order', 'imageUpload', 'imageUrl', 'subtitle', 'title', 'description', 'alt', 'isActive'],
     required: ['imageUrl', 'title'],
     labels: { order: 'Expert article position', imageUpload: 'Upload article image *', imageUrl: 'Image URL *', subtitle: 'Small article label', title: 'Article headline *', description: 'Article summary / caption', alt: 'Image description for accessibility' }
-  },
-  'Insight news update canvas card': {
-    intro: 'Add or replace a visual card inside News & Updates. This affects only News & Updates.',
-    fields: ['order', 'imageUpload', 'imageUrl', 'subtitle', 'title', 'description', 'alt', 'isActive'],
-    required: ['imageUrl', 'title'],
-    labels: { order: 'News card position', imageUpload: 'Upload update image *', imageUrl: 'Image URL *', subtitle: 'Small update label', title: 'Update headline *', description: 'Update summary / caption', alt: 'Image description for accessibility' }
   },
   'Insight resource canvas card': {
     intro: 'Add or replace a visual card inside Resources. This affects only Resources.',
@@ -4266,13 +4536,30 @@ function useHashScroll() {
 }
 
 function SiteLayout({ config, theme, onToggleTheme, children, onSurveyLeadReady, footerSlot, surveyOpenSignal }) {
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
+
+  useEffect(() => {
+    const openAppointment = () => setAppointmentOpen(true);
+    window.addEventListener('neurocogno:open-appointment', openAppointment);
+    return () => window.removeEventListener('neurocogno:open-appointment', openAppointment);
+  }, []);
+
   return (
     <>
       <Header contact={config.contact} theme={theme} onToggleTheme={onToggleTheme} />
       <main>{children}</main>
-      {footerSlot ?? <PageLinks current={window.location.pathname === '/' ? '/about-us' : window.location.pathname} />}
+      <AnnouncementPanel />
+      <CrisisSupportPanel contact={config.contact} />
+      {footerSlot}
       <Footer contact={config.contact} />
       {onSurveyLeadReady && <SurveyPopup config={config} onLeadReady={onSurveyLeadReady} openSignal={surveyOpenSignal} />}
+      {appointmentOpen && (
+        <AppointmentModal
+          config={config}
+          onLeadReady={onSurveyLeadReady}
+          onClose={() => setAppointmentOpen(false)}
+        />
+      )}
     </>
   );
 }
@@ -4287,12 +4574,12 @@ function AboutUsPage({ theme, onToggleTheme }) {
 
   return (
     <SiteLayout config={config} theme={theme} onToggleTheme={onToggleTheme} onSurveyLeadReady={setPendingLead} footerSlot={<FounderStory />}>
+      <HomeSectionRail />
       <Hero contact={config.contact} content={homepageContent} />
       <About />
       <WhoWeHelp />
-            <Services />
+      <Services />
       <Booking config={config} onLeadReady={setPendingLead} />
-      <PaymentPanel pendingLead={pendingLead} config={config} />
       <TestimonialsFaq contact={config.contact} />
     </SiteLayout>
   );
@@ -4353,35 +4640,9 @@ function App() {
   if (path === '/' || path.startsWith('/about-us')) return <AboutUsPage theme={theme} onToggleTheme={toggleTheme} />;
   if (path.startsWith('/neurocogno-insight')) return <InsightPage theme={theme} onToggleTheme={toggleTheme} />;
   if (path.startsWith('/workshops-events')) return <WorkshopsPage theme={theme} onToggleTheme={toggleTheme} />;
-  if (path.startsWith('/collaborations')) return <CollaborationPage theme={theme} onToggleTheme={toggleTheme} />;
+  if (path.startsWith('/founders') || path.startsWith('/collaborations')) return <AboutUsPage theme={theme} onToggleTheme={toggleTheme} />;
   if (path.startsWith('/services')) return <ServicesPage theme={theme} onToggleTheme={toggleTheme} />;
   return <AboutUsPage theme={theme} onToggleTheme={toggleTheme} />;
 }
 
 createRoot(document.getElementById('root')).render(<App />);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
